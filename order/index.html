@@ -718,12 +718,9 @@
         fill: none;
     }
 
+    /* Active huda yellow color hatauna yaha changes garieko xa */
     .bottom-nav .nav-item.active {
-        background-color: #fff9e6;
-        color: #f39c12;
-        border-radius: 16px;
-        height: 48px;
-        margin: auto 4px;
+        color: #333333; /* Active huda kasto color rakhne, yaha dark gray haleko xa */
     }
 </style>
 
@@ -734,14 +731,12 @@
 
         navItems.forEach(item => {
             const href = item.getAttribute('href');
-            // Remove trailing slashes for clean matching
             const cleanHref = href.replace(/\.\./g, '').replace(/\/+/g, '/');
             
             if (cleanHref !== "/" && currentPath.includes(cleanHref)) {
                 navItems.forEach(nav => nav.classList.remove('active'));
                 item.classList.add('active');
             } else if (cleanHref === "/" && (currentPath === "/" || currentPath.endsWith("index.html"))) {
-                // Home page ko lagi condition
                 navItems.forEach(nav => nav.classList.remove('active'));
                 item.classList.add('active');
             }
