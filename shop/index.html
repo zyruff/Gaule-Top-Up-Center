@@ -172,6 +172,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -321,6 +322,7 @@
         .status-completed { background-color: #dcfce7; color: #166534; }
         .status-pending { background-color: #fef3c7; color: #b45309; }
         .status-cancelled { background-color: #fee2e2; color: #991b1b; }
+        .status-rejected { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
 
         .item-details { display: flex; flex-direction: column; gap: 6px; }
         .product-name { font-size: 15px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 6px; }
@@ -331,12 +333,13 @@
         
         .price-tag { font-size: 15px; font-weight: 800; color: #059669; margin-top: 4px; }
 
-        .admin-action-box { display: none; gap: 8px; margin-top: 14px; border-top: 1px solid #f1f5f9; padding-top: 12px; }
+        .admin-action-box { display: none; flex-direction: column; gap: 6px; margin-top: 14px; border-top: 1px solid #f1f5f9; padding-top: 12px; }
         .admin-action-box.visible { display: flex; }
+        .admin-btn-row { display: flex; gap: 6px; }
         
         .adm-btn { 
             flex: 1; 
-            padding: 8px 0; 
+            padding: 7px 0; 
             border: none; 
             border-radius: 8px; 
             font-size: 11px; 
@@ -344,7 +347,9 @@
             cursor: pointer; 
         }
         .btn-complete { background: #dcfce7; color: #166534; }
-        .btn-cancel { background: #fee2e2; color: #991b1b; }
+        .btn-cancel { background: #fef3c7; color: #b45309; }
+        .btn-reject { background: #fee2e2; color: #991b1b; }
+        .btn-delete { background: #0f172a; color: #ffffff; width: 100%; }
 
         .no-data { text-align: center; padding: 50px 20px; color: #64748b; font-size: 13px; font-weight: 500; }
         
@@ -395,7 +400,7 @@
         <div class="filter-tabs" id="filterTabs">
             <button class="filter-btn active" onclick="filterOrders('all', this)">All</button>
             <button class="filter-btn" onclick="filterOrders('pending', this)">Pending</button>
-            <button class="filter-btn" onclick="filterOrders('completed', this)">Completed</button>
+            <button class="filter-btn" onclick="filterOrders('complete', this)">Completed</button>
             <button class="filter-btn" onclick="filterOrders('cancelled', this)">Cancelled</button>
             <button class="filter-btn" onclick="filterOrders('rejected', this)">Rejected</button>
         </div>
@@ -455,7 +460,6 @@
             
             const currentUser = auth.currentUser;
             
-            // Yadi login vako chaina vane real google logo sathko login prompt dekhaune
             if (!currentUser) {
                 container.innerHTML = `
                     <div class="no-data">
@@ -498,7 +502,7 @@
                 const orderAmount = order.amountDue !== undefined ? order.amountDue : (order.amount !== undefined ? order.amount : (order.price !== undefined ? order.price : (order.total || '0')));
                 const orderIdStr = '#' + key.slice(-5);
 
-                const matchesStatus = (currentStatusFilter === 'all' || orderStatus === currentStatusFilter || (currentStatusFilter === 'completed' && orderStatus === 'complete'));
+                const matchesStatus = (currentStatusFilter === 'all' || orderStatus === currentStatusFilter || (currentStatusFilter === 'complete' && (orderStatus === 'completed' || orderStatus === 'complete')));
                 const searchString = `${orderIdStr} ${productTitle} ${displayEmail} ${displayUID} ${orderAmount} ${order.redeemCode || ''}`.toLowerCase();
                 const matchesSearch = searchString.includes(searchQuery);
 
@@ -507,7 +511,8 @@
 
                     let statusClass = 'status-pending';
                     if (orderStatus === 'completed' || orderStatus === 'complete') statusClass = 'status-completed';
-                    else if (orderStatus === 'cancelled' || orderStatus === 'rejected') statusClass = 'status-cancelled';
+                    else if (orderStatus === 'cancelled') statusClass = 'status-cancelled';
+                    else if (orderStatus === 'rejected') statusClass = 'status-rejected';
 
                     const cardHTML = `
                         <div class="order-card">
@@ -523,8 +528,12 @@
                                 <div class="price-tag">Rs. ${orderAmount}</div>
                             </div>
                             <div class="admin-action-box ${isAdmin ? 'visible' : ''}">
-                                <button class="adm-btn btn-complete" onclick="updateStatus('${key}', 'completed')"><i class="fa-solid fa-check"></i> Complete</button>
-                                <button class="adm-btn btn-cancel" onclick="updateStatus('${key}', 'cancelled')"><i class="fa-solid fa-xmark"></i> Cancel</button>
+                                <div class="admin-btn-row">
+                                    <button class="adm-btn btn-complete" onclick="completeOrder('${key}')"><i class="fa-solid fa-check"></i> Complete</button>
+                                    <button class="adm-btn btn-cancel" onclick="updateStatus('${key}', 'cancelled')"><i class="fa-solid fa-ban"></i> Cancel</button>
+                                    <button class="adm-btn btn-reject" onclick="updateStatus('${key}', 'rejected')"><i class="fa-solid fa-xmark"></i> Reject</button>
+                                </div>
+                                <button class="adm-btn btn-delete" onclick="deleteOrder('${key}')"><i class="fa-solid fa-trash"></i> Delete Order</button>
                             </div>
                         </div>
                     `;
@@ -563,19 +572,24 @@
             renderOrders();
         }
 
+        function completeOrder(key) {
+            const redeemCode = prompt("Enter the Unipin / Redeem Code (Optional - click OK/Cancel to leave empty):");
+            let updateData = { status: 'complete' };
+            
+            if (redeemCode !== null && redeemCode.trim() !== "") {
+                updateData.redeemCode = redeemCode.trim();
+            }
+
+            db.ref('orders/' + key).update(updateData).catch(err => alert(err.message));
+        }
+
         function updateStatus(key, status) {
-            if (status === 'completed') {
-                const redeemCode = prompt("Enter the Unipin / Redeem Code:");
-                if (redeemCode !== null && redeemCode !== "") {
-                    db.ref('orders/' + key).update({ 
-                        status: status,
-                        redeemCode: redeemCode 
-                    }).catch(err => alert(err.message));
-                } else {
-                    alert("Code halnu bhayena, order complete garna milena.");
-                }
-            } else {
-                db.ref('orders/' + key).update({ status: status }).catch(err => alert(err.message));
+            db.ref('orders/' + key).update({ status: status }).catch(err => alert(err.message));
+        }
+
+        function deleteOrder(key) {
+            if (confirm("Yo order database bata permanent delete garne ho?")) {
+                db.ref('orders/' + key).remove().catch(err => alert(err.message));
             }
         }
 
@@ -587,6 +601,9 @@
     </script>
 </body>
 </html>
+
+
+
 
 
 
