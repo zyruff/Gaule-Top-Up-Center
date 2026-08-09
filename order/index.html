@@ -172,8 +172,6 @@
 
 
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -415,7 +413,7 @@
         <div class="search-bar-container" id="searchBarContainer">
             <div class="search-input-wrap">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="orderSearchInput" class="search-input" placeholder="Search Product, Email, UID..." onkeyup="renderOrders()">
+                <input type="text" id="orderSearchInput" class="search-input" placeholder="Search Product, Email, UID, Txn ID..." onkeyup="renderOrders()">
             </div>
         </div>
 
@@ -480,7 +478,6 @@
         function formatOrderDate(order) {
             let timestamp = order.timestamp || order.date || order.createdAt;
             if (!timestamp) {
-                // If no direct timestamp property, try extracting roughly from push key if standard Firebase push key
                 return '';
             }
             let dateObj = new Date(timestamp);
@@ -546,9 +543,12 @@
                 const orderAmount = order.amountDue !== undefined ? order.amountDue : (order.amount !== undefined ? order.amount : (order.price !== undefined ? order.price : (order.total || '0')));
                 const orderIdStr = '#' + key.slice(-5);
                 const orderDateStr = formatOrderDate(order);
+                
+                // Fetching transaction ID from multiple possible database keys (transactionId, txnId, transactionID)
+                const transactionId = order.transactionId || order.txnId || order.transactionID || '';
 
                 const matchesStatus = (currentStatusFilter === 'all' || orderStatus === currentStatusFilter || (currentStatusFilter === 'complete' && (orderStatus === 'completed' || orderStatus === 'complete')));
-                const searchString = `${orderIdStr} ${productTitle} ${displayEmail} ${displayUID} ${orderAmount} ${order.redeemCode || ''} ${orderDateStr}`.toLowerCase();
+                const searchString = `${orderIdStr} ${productTitle} ${displayEmail} ${displayUID} ${orderAmount} ${order.redeemCode || ''} ${transactionId} ${orderDateStr}`.toLowerCase();
                 const matchesSearch = searchString.includes(searchQuery);
 
                 if (matchesStatus && matchesSearch) {
@@ -570,6 +570,12 @@
                                 ${displayEmail ? `<div class="info-row"><i class="fa-solid fa-envelope"></i> ${displayEmail}</div>` : ''}
                                 ${displayUID ? `<div class="info-row"><i class="fa-solid fa-gamepad"></i> UID: <b>${displayUID}</b></div>` : ''}
                                 ${order.redeemCode ? `<div class="info-row" style="color:#2563eb;"><i class="fa-solid fa-key"></i> Code: <b>${order.redeemCode}</b></div>` : ''}
+                                
+                                <!-- Admin-Only Transaction ID Box -->
+                                <div class="admin-action-box ${isAdmin ? 'visible' : ''}" style="margin-top: 6px; margin-bottom: 0px; border-top: none; padding-top: 0px;">
+                                    ${transactionId ? `<div class="info-row" style="color:#059669;"><i class="fa-solid fa-receipt"></i> Txn ID: <b>${transactionId}</b></div>` : `<div class="info-row" style="color:#6b7280;"><i class="fa-solid fa-receipt"></i> Txn ID: <b>Not Provided</b></div>`}
+                                </div>
+
                                 <div class="price-tag">Rs. ${orderAmount}</div>
                             </div>
                             <div class="admin-action-box ${isAdmin ? 'visible' : ''}">
@@ -645,7 +651,6 @@
     </script>
 </body>
 </html>
-
 
 
 
