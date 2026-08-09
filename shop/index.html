@@ -173,7 +173,6 @@
 
 
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -194,6 +193,7 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            background-attachment: fixed;
             color: #0f172a; 
             min-height: 100vh; 
             width: 100%;
@@ -201,13 +201,43 @@
         
         .mobile-container { 
             width: 100%;
+            max-width: 480px; 
             min-height: 100vh; 
+            margin: 0 auto;
             position: relative; 
             background: transparent;
+            box-shadow: none;
+        }
+
+        /* PC / Desktop Responsive Styles - Centered Container & Larger Width */
+        @media (min-width: 768px) {
+            body {
+                display: flex;
+                justify-content: center;
+                padding: 30px 20px;
+            }
+            .mobile-container {
+                max-width: 800px;
+                min-height: calc(100vh - 60px);
+                background: rgba(255, 255, 255, 0.85);
+                backdrop-filter: blur(20px);
+                border: 1px solid #e2e8f0;
+                border-radius: 24px;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+                overflow: hidden;
+            }
+            #orders-list {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+            .no-data, .login-prompt-btn {
+                grid-column: span 2;
+            }
         }
 
         .app-header { 
-            background: rgba(255, 255, 255, 0.9); 
+            background: rgba(255, 255, 255, 0.95); 
             backdrop-filter: blur(12px); 
             padding: 16px 20px; 
             display: flex; 
@@ -239,7 +269,7 @@
 
         .search-bar-container {
             padding: 12px 20px 0 20px;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             position: sticky;
             top: 71px;
             z-index: 99;
@@ -261,11 +291,14 @@
         }
         .search-input:focus { border-color: #0284c7; background: #fff; }
 
+        /* Filter Tabs Centered & Even Sizing (3 items now: All, Pending, Completed, Rejected) */
         .filter-tabs {
             display: flex;
-            gap: 6px;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
             padding: 12px 20px;
-            background: rgba(248, 250, 252, 0.9);
+            background: rgba(248, 250, 252, 0.95);
             position: sticky;
             top: 71px;
             z-index: 98;
@@ -277,7 +310,9 @@
         .filter-tabs.shifted { top: 135px; }
 
         .filter-btn {
-            padding: 6px 14px;
+            flex: 1;
+            max-width: 110px;
+            padding: 8px 10px;
             background-color: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 20px;
@@ -285,6 +320,7 @@
             font-weight: 700;
             color: #64748b;
             cursor: pointer;
+            text-align: center;
             white-space: nowrap;
             transition: 0.2s;
         }
@@ -294,7 +330,7 @@
             border-color: #0f172a;
         }
 
-        #orders-list { padding: 16px; display: flex; flex-direction: column; gap: 12px; max-width: 600px; margin: 0 auto; }
+        #orders-list { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 
         .order-card { 
             background: #ffffff; 
@@ -325,7 +361,6 @@
         }
         .status-completed { background-color: #dcfce7; color: #166534; }
         .status-pending { background-color: #fef3c7; color: #b45309; }
-        .status-cancelled { background-color: #fee2e2; color: #991b1b; }
         .status-rejected { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
 
         .item-details { display: flex; flex-direction: column; gap: 6px; }
@@ -352,7 +387,6 @@
             cursor: pointer; 
         }
         .btn-complete { background: #dcfce7; color: #166534; }
-        .btn-cancel { background: #fef3c7; color: #b45309; }
         .btn-reject { background: #fee2e2; color: #991b1b; }
         .btn-delete { background: #0f172a; color: #ffffff; width: 100%; }
 
@@ -401,12 +435,11 @@
             </div>
         </div>
 
-        <!-- Filter Tabs -->
+        <!-- Filter Tabs (Cancelled removed, evenly spaced & centered) -->
         <div class="filter-tabs" id="filterTabs">
             <button class="filter-btn active" onclick="filterOrders('all', this)">All</button>
             <button class="filter-btn" onclick="filterOrders('pending', this)">Pending</button>
             <button class="filter-btn" onclick="filterOrders('complete', this)">Completed</button>
-            <button class="filter-btn" onclick="filterOrders('cancelled', this)">Cancelled</button>
             <button class="filter-btn" onclick="filterOrders('rejected', this)">Rejected</button>
         </div>
 
@@ -503,7 +536,11 @@
                 const displayUID = (order.uid && order.uid.length < 20) ? order.uid : (order.playerId || order.gameId || order.playerUID || '');
                 const displayEmail = order.email || order.userEmail || '';
                 const productTitle = order.product || order.productName || order.title || 'Game Topup';
-                const orderStatus = (order.status || 'pending').toLowerCase();
+                let orderStatus = (order.status || 'pending').toLowerCase();
+                
+                // Map old cancelled records to rejected so they still render smoothly
+                if (orderStatus === 'cancelled') orderStatus = 'rejected';
+
                 const orderAmount = order.amountDue !== undefined ? order.amountDue : (order.amount !== undefined ? order.amount : (order.price !== undefined ? order.price : (order.total || '0')));
                 const orderIdStr = '#' + key.slice(-5);
 
@@ -516,7 +553,6 @@
 
                     let statusClass = 'status-pending';
                     if (orderStatus === 'completed' || orderStatus === 'complete') statusClass = 'status-completed';
-                    else if (orderStatus === 'cancelled') statusClass = 'status-cancelled';
                     else if (orderStatus === 'rejected') statusClass = 'status-rejected';
 
                     const cardHTML = `
@@ -535,7 +571,6 @@
                             <div class="admin-action-box ${isAdmin ? 'visible' : ''}">
                                 <div class="admin-btn-row">
                                     <button class="adm-btn btn-complete" onclick="completeOrder('${key}')"><i class="fa-solid fa-check"></i> Complete</button>
-                                    <button class="adm-btn btn-cancel" onclick="updateStatus('${key}', 'cancelled')"><i class="fa-solid fa-ban"></i> Cancel</button>
                                     <button class="adm-btn btn-reject" onclick="updateStatus('${key}', 'rejected')"><i class="fa-solid fa-xmark"></i> Reject</button>
                                 </div>
                                 <button class="adm-btn btn-delete" onclick="deleteOrder('${key}')"><i class="fa-solid fa-trash"></i> Delete Order</button>
@@ -606,6 +641,8 @@
     </script>
 </body>
 </html>
+
+
 
 
 
