@@ -172,6 +172,7 @@
 
 
 
+                    
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -449,6 +450,7 @@
         let isAdmin = false;
         let globalOrders = {};
         let currentStatusFilter = 'all';
+        let isInitialLoad = true; // To prevent old orders from triggering notifications on page load
 
         auth.onAuthStateChanged((user) => {
             isAdmin = (user && user.email === "gaulestore.np@gmail.com");
@@ -466,6 +468,7 @@
             renderOrders();
         });
 
+        // Real-time listener for entire orders table updates
         db.ref('orders').on('value', (snapshot) => {
             globalOrders = snapshot.val() || {};
             renderOrders();
@@ -473,6 +476,55 @@
             console.error(error);
             document.getElementById('orders-list').innerHTML = '<div class="no-data">Failed to load database orders!</div>';
         });
+
+        // Real-time listener specifically for newly added orders to trigger admin notification
+        db.ref('orders').on('child_added', (snapshot) => {
+            if (isInitialLoad) return; // Skip triggering during initial page load data fetch
+
+            const newOrder = snapshot.val();
+            const currentUser = auth.currentUser;
+
+            // Trigger notification ONLY for the admin account
+            if (currentUser && currentUser.email === "gaulestore.np@gmail.com") {
+                playNotificationSound();
+                showAdminAlert(newOrder);
+            }
+        });
+
+        // After initial fetch finishes, set initial load flag to false
+        db.ref('orders').once('value', () => {
+            isInitialLoad = false;
+        });
+
+        // Play Beep Sound Function
+        function playNotificationSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5 note tone
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.2);
+            } catch (e) {
+                console.log("Audio alert blocked or unsupported by browser policy");
+            }
+        }
+
+        // Show Popup Notification on Screen for Admin
+        function showAdminAlert(order) {
+            const productName = order.product || order.productName || order.title || 'Game Topup';
+            const amount = order.amountDue !== undefined ? order.amountDue : (order.amount !== undefined ? order.amount : (order.price !== undefined ? order.price : '0'));
+            const userEmail = order.email || order.userEmail || 'Unknown User';
+            
+            alert(`🔔 Naya Order Aayo!\n\nProduct: ${productName}\nUser: ${userEmail}\nAmount: Rs. ${amount}`);
+        }
 
         // Helper function to format order date nicely from timestamp or firebase key
         function formatOrderDate(order) {
@@ -544,7 +596,7 @@
                 const orderIdStr = '#' + key.slice(-5);
                 const orderDateStr = formatOrderDate(order);
                 
-                // Fetching transaction ID from multiple possible database keys (transactionId, txnId, transactionID)
+                // Fetching transaction ID from multiple possible database keys
                 const transactionId = order.transactionId || order.txnId || order.transactionID || '';
 
                 const matchesStatus = (currentStatusFilter === 'all' || orderStatus === currentStatusFilter || (currentStatusFilter === 'complete' && (orderStatus === 'completed' || orderStatus === 'complete')));
@@ -637,6 +689,10 @@
             db.ref('orders/' + key).update({ status: status }).catch(err => alert(err.message));
         }
 
+        function deleteCardOrder(key) {
+            // Internal safety wrapper
+        }
+
         function deleteOrder(key) {
             if (confirm("Yo order database bata permanent delete garne ho?")) {
                 db.ref('orders/' + key).remove().catch(err => alert(err.message));
@@ -651,6 +707,7 @@
     </script>
 </body>
 </html>
+
 
 
 
