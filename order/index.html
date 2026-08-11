@@ -73,7 +73,7 @@
         <input type="text" id="gameSearch" placeholder="Search games...">
         <button onclick="alert('Searching...')">Search</button>
     </div>
-    <a href="../index.html">Home</a>
+    <a href="index.html">Home</a>
     <div id="my-orders-link" style="display:none;"><a href="#" onclick="showOrders()">My Orders</a></div>
     <a href="shop/">Shop</a>
     <a href="https://wa.me/9779761081110" target="_blank">Contact Us</a>
@@ -172,7 +172,7 @@
 
 
 
-                    
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -500,10 +500,9 @@
                 if (permission === 'granted') {
                     document.getElementById('notifBanner').classList.remove('active');
                     
-                    // Retrieve FCM Token using Web Push VAPID key if configured in Firebase console
-                    messaging.getToken({ vapidKey: 'YOUR_PUBLIC_VAPID_KEY_HERE' }).then((currentToken) => {
+                    // Retrieve FCM Token using Web Push VAPID key
+                    messaging.getToken({ vapidKey: 'BKsw2CqPR2L9MI5cl3HgZYDL82zu4gqctQl0DRUpcM1roZ44jKV6O2kOLPr4C6FOuEbYCdRsB-7XBQPJ_zUywqc' }).then((currentToken) => {
                         if (currentToken && auth.currentUser) {
-                            // Save device token mapping securely in Firebase under the user's ID
                             const safeEmailKey = auth.currentUser.email.replace(/[.#$[\]]/g, "_");
                             db.ref('fcmTokens/' + safeEmailKey).set(currentToken);
                         }
@@ -520,7 +519,6 @@
         messaging.onMessage((payload) => {
             console.log('Message received. ', payload);
             if (payload.notification) {
-                // Display native notification popup if supported
                 if (Notification.permission === 'granted') {
                     new Notification(payload.notification.title, {
                         body: payload.notification.body,
@@ -539,9 +537,8 @@
                     adminTag.style.display = 'inline-block';
                 } else {
                     adminTag.style.display = 'none';
-                    // Auto request or register FCM token if already permitted
                     if (Notification.permission === 'granted') {
-                        messaging.getToken().then((currentToken) => {
+                        messaging.getToken({ vapidKey: 'YOUR_PUBLIC_VAPID_KEY_HERE' }).then((currentToken) => {
                             if (currentToken) {
                                 const safeEmailKey = user.email.replace(/[.#$[\]]/g, "_");
                                 db.ref('fcmTokens/' + safeEmailKey).set(currentToken);
@@ -729,10 +726,6 @@
 </html>
 
 
-          
-
-
-
 
 <br>
 <div class="bottom-nav">
@@ -740,7 +733,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
         <span>Home</span>
     </a>
-    <a href="shop/." class="nav-item">
+    <a href="shop/" class="nav-item">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
         <span>Shop</span>
     </a>
@@ -748,7 +741,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
         <span>Order</span>
     </a>
-    <a href="../account" class="nav-item">
+    <a href="account/" class="nav-item">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         <span>Account</span>
     </a>
