@@ -448,7 +448,7 @@
         <div class="search-bar-container" id="searchBarContainer">
             <div class="search-input-wrap">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="orderSearchInput" class="search-input" placeholder="Search Product, Email, UID, Txn ID..." onkeyup="renderOrders()">
+                <input type="text" id="orderSearchInput" class="search-input" placeholder="Search Product, Email, UID, Zone ID, Txn ID..." onkeyup="renderOrders()">
             </div>
         </div>
 
@@ -484,13 +484,10 @@
         let isAdmin = false;
         let globalOrders = {};
         let currentStatusFilter = 'all';
-        let isFirstLoad = true; // To prevent alerts for existing orders when page loads
+        let isFirstLoad = true;
 
-        // Check Notification Permission on load for Admin
         if ('Notification' in window) {
-            if (Notification.permission === 'default') {
-                // Will show banner only if logged in as admin
-            }
+            if (Notification.permission === 'default') {}
         }
 
         function requestAdminNotificationPermission() {
@@ -526,19 +523,16 @@
             renderOrders();
         });
 
-        // Listen for newly added orders specifically for Admin alert
         db.ref('orders').on('child_added', (snapshot) => {
             if (!isFirstLoad && isAdmin) {
                 const newOrder = snapshot.val();
                 if (newOrder) {
-                    // Browser Notification
                     if ('Notification' in window && Notification.permission === 'granted') {
                         new Notification("🚨 Naya Order Aayo!", {
                             body: `Product: ${newOrder.product || newOrder.productName || 'Game Topup'} | Rs. ${newOrder.amountDue || newOrder.amount || newOrder.price || 0}`,
                             icon: 'gaulestore.png'
                         });
                     }
-                    // Audio Alert
                     try {
                         let audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
                         audio.play().catch(e => console.log("Audio play blocked"));
@@ -549,19 +543,16 @@
 
         db.ref('orders').on('value', (snapshot) => {
             globalOrders = snapshot.val() || {};
-            isFirstLoad = false; // Initial load finished
+            isFirstLoad = false;
             renderOrders();
         }, (error) => {
             console.error(error);
             document.getElementById('orders-list').innerHTML = '<div class="no-data">Failed to load database orders!</div>';
         });
 
-        // Helper function to format order date nicely from timestamp or firebase key
         function formatOrderDate(order) {
             let timestamp = order.timestamp || order.date || order.createdAt;
-            if (!timestamp) {
-                return '';
-            }
+            if (!timestamp) return '';
             let dateObj = new Date(timestamp);
             if (isNaN(dateObj.getTime())) return '';
             
@@ -583,13 +574,7 @@
             if (!currentUser) {
                 container.innerHTML = `
                     <div class="no-data">
-                        <p style="font-weight: 800; color: #0f172a; font-size: 17px;">
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>Welcome to Gaule Store</p>
+                        <p style="font-weight: 800; color: #0f172a; font-size: 17px;">Welcome to Gaule Store</p>
                         <p style="color: #475569; font-size: 13px; margin-top: 6px; font-weight: 600;">Please login to view your order history</p>
                         <button class="login-prompt-btn" onclick="handleAuthAction()">
                             <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -622,6 +607,9 @@
                 if (!isAdmin && !isOwner) return;
 
                 const displayUID = (order.uid && order.uid.length < 20) ? order.uid : (order.playerId || order.gameId || order.playerUID || '');
+                // Zone ID pull garne (zoneId, zone, server, zoneID yedi jun name ma vayeni tanxa)
+                const displayZoneId = order.zoneId || order.zone || order.server || order.zoneID || '';
+                
                 const displayEmail = order.email || order.userEmail || '';
                 const productTitle = order.product || order.productName || order.title || 'Game Topup';
                 let orderStatus = (order.status || 'pending').toLowerCase();
@@ -634,7 +622,7 @@
                 const transactionId = order.transactionId || order.txnId || order.transactionID || '';
 
                 const matchesStatus = (currentStatusFilter === 'all' || orderStatus === currentStatusFilter || (currentStatusFilter === 'complete' && (orderStatus === 'completed' || orderStatus === 'complete')));
-                const searchString = `${orderIdStr} ${productTitle} ${displayEmail} ${displayUID} ${orderAmount} ${order.redeemCode || ''} ${transactionId} ${orderDateStr}`.toLowerCase();
+                const searchString = `${orderIdStr} ${productTitle} ${displayEmail} ${displayUID} ${displayZoneId} ${orderAmount} ${order.redeemCode || ''} ${transactionId} ${orderDateStr}`.toLowerCase();
                 const matchesSearch = searchString.includes(searchQuery);
 
                 if (matchesStatus && matchesSearch) {
@@ -655,6 +643,7 @@
                                 ${orderDateStr ? `<div class="info-row"><i class="fa-solid fa-calendar-days"></i> ${orderDateStr}</div>` : ''}
                                 ${displayEmail ? `<div class="info-row"><i class="fa-solid fa-envelope"></i> ${displayEmail}</div>` : ''}
                                 ${displayUID ? `<div class="info-row"><i class="fa-solid fa-gamepad"></i> UID: <b>${displayUID}</b></div>` : ''}
+                                ${displayZoneId ? `<div class="info-row"><i class="fa-solid fa-server"></i> Zone ID: <b>${displayZoneId}</b></div>` : ''}
                                 ${order.redeemCode ? `<div class="info-row" style="color:#2563eb;"><i class="fa-solid fa-key"></i> Code: <b>${order.redeemCode}</b></div>` : ''}
                                 
                                 <div class="admin-action-box ${isAdmin ? 'visible' : ''}" style="margin-top: 6px; margin-bottom: 0px; border-top: none; padding-top: 0px;">
@@ -736,6 +725,7 @@
     </script>
 </body>
 </html>
+
 
 
 
