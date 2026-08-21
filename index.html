@@ -72,9 +72,12 @@
         <span class="close-btn" onclick="toggleMenu()">&times;</span>
     </div>
     <div class="search-box">
-        <input type="text" id="gameSearch" placeholder="Search games...">
-        <button onclick="alert('Searching...')">Search</button>
-    </div>
+    <input type="text" id="gameSearch" placeholder="Search games..." onkeyup="filterGames()">
+    <button onclick="filterGames()">Search</button>
+</div>
+<!-- सर्च गरेको रिजल्ट देखाउने ठाउँ -->
+<div id="search-results" style="margin-bottom: 15px; max-height: 200px; overflow-y: auto;"></div>
+     
     <a href="index.html">Home</a>
     <div id="my-orders-link" style="display:none;"><a href="#" onclick="showOrders()">My Orders</a></div>
     <a href="shop/">Shop</a>
