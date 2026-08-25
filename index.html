@@ -218,6 +218,66 @@
     <div class="swiper-pagination"></div>
   </div>
 
+
+<!-- Style (CSS) -->
+<style>
+    .gaming-header-container {
+        text-align: center;
+        width: 100%;
+        max-width: 700px;
+        margin: 40px auto;
+        font-family: Arial, sans-serif;
+    }
+
+    .gaming-title-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .gaming-title-wrapper::before,
+    .gaming-title-wrapper::after {
+        content: "";
+        flex: 1;
+        border-bottom: 2px solid #cbd5e1;
+        margin: 0 15px;
+    }
+
+    .gaming-main-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #1e293b;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    .gaming-sub-title {
+        font-size: 0.95rem;
+        color: #334155;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-top: 12px;
+        font-weight: 600;
+    }
+</style>
+
+<!-- Content (HTML) -->
+<div class="gaming-header-container">
+    <div class="gaming-title-wrapper">
+        <h1 class="gaming-main-title">GAMING TOPUP & UC</h1>
+    </div>
+    <div class="gaming-sub-title">
+        INSTANT DELIVERY FOR YOUR FAVORITE GAMES
+    </div>
+</div>
+
+
+
+
+     
   <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
   <script>
     const swiper = new Swiper('.swiper', {
