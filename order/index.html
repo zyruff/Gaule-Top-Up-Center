@@ -174,6 +174,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -482,8 +483,8 @@
         try {
             if (firebase.messaging.isSupported()) {
                 messaging = firebase.messaging();
-                // VAPID Key integration here
-                messaging.usePublicVapidKey("BKsw2CqPR2L9MI5cl3HgZYDL82zu4gqctQl0DRUpcM1roZ44jKV6O2kOLPr4C6FOuEbYCdRsB-7XBQPJ_zUywqc");
+                // Updated VAPID Key integration
+                messaging.usePublicVapidKey("BPZPMGwxkdbhnw8ZW1wseavJy3MpoOrFqXz9QR4dCcStDQ8hPBET-QZ8E9fXvn5fg5ddC6yuf9_ICKYs2CVyO9o");
             }
         } catch(e) {
             console.log("Messaging not supported or error", e);
