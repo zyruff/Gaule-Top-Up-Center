@@ -437,7 +437,7 @@
         </div>
 
         <!-- Admin Notification Banner -->
-        <div class="admin-notif-banner" id="adminNotifBanner">
+        <div class="admin-notif-banner active" id="adminNotifBanner">
             <span><i class="fa-solid fa-bell"></i> Enable sound & popup alerts for new orders</span>
             <button class="admin-notif-btn" onclick="requestAdminNotificationPermission()">Turn On</button>
         </div>
@@ -494,7 +494,7 @@
         let currentStatusFilter = 'all';
         let allowNotifications = false;
 
-        // पेज लोड भएको ३ सेकेन्डपछि मात्र नयाँ अर्डरको लागि नोटिफिकेशन र साउन्ड अन हुनेछ (पुरानो डेटा लोड हुँदा नबजos भन्नको लागि)
+        // पेज लोड भएको ३ सेकेन्डपछि मात्र नयाँ अर्डरको लागि नोटिफिकेशन र साउन्ड अन हुनेछ (पुरानो डेटा लोड हुँदा नबजोस् भन्नको लागि)
         setTimeout(() => {
             allowNotifications = true;
         }, 3000);
@@ -525,28 +525,18 @@
         auth.onAuthStateChanged((user) => {
             isAdmin = (user && user.email === "gaulestore.np@gmail.com");
             const adminTag = document.getElementById('adminTag');
-            const notifBanner = document.getElementById('adminNotifBanner');
             
-            if (user) {
-                if (isAdmin) {
-                    adminTag.style.display = 'inline-block';
-                    if ('Notification' in window && Notification.permission === 'default') {
-                        notifBanner.classList.add('active');
-                    }
-                } else {
-                    adminTag.style.display = 'none';
-                    notifBanner.classList.remove('active');
-                }
+            if (user && isAdmin) {
+                adminTag.style.display = 'inline-block';
             } else {
                 adminTag.style.display = 'none';
-                notifBanner.classList.remove('active');
             }
             renderOrders();
         });
 
-        // नयाँ अर्डर थपिँदा मात्र ट्रिगर हुने इभेन्ट
+        // नयाँ अर्डर थपिँदा जुनसुकै बेला साउन्ड र पपअप बज्ने (Admin चेक हटाइएको)
         db.ref('orders').on('child_added', (snapshot) => {
-            if (allowNotifications && isAdmin) {
+            if (allowNotifications) {
                 const newOrder = snapshot.val();
                 if (newOrder) {
                     if ('Notification' in window && Notification.permission === 'granted') {
@@ -746,6 +736,7 @@
     </script>
 </body>
 </html>
+
 
 
 
