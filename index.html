@@ -181,6 +181,27 @@
 </div>
 
 
+import { getMessaging, getToken } from "firebase/messaging";
+
+const messaging = getMessaging();
+
+Notification.requestPermission().then((permission) => {
+    if (permission === 'granted') {
+        console.log('Notification permission granted.');
+        getToken(messaging, { vapidKey: 'BPZPMGwxkdbhnw8ZW1wseavJy3MpoOrFqXz9QR4dCcStDQ8hPBET-QZ8E9fXvn5fg5ddC6yuf9_ICKYs2CVyO9o' })
+            .then((currentToken) => {
+                if (currentToken) {
+                    console.log('FCM Token:', currentToken);
+                } else {
+                    console.log('No registration token available.');
+                }
+            }).catch((err) => {
+                console.log('An error occurred while retrieving token. ', err);
+            });
+    } else {
+        console.log('Unable to get permission to notify.');
+    }
+});
 
 
 
