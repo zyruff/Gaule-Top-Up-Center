@@ -447,23 +447,32 @@
         const auth = firebase.auth();
         const db = firebase.database();
         
+        let messaging = null;
+        try {
+            if ('serviceWorker' in navigator && firebase.messaging.isSupported()) {
+                navigator.serviceWorker.register('firebase-messaging-sw.js').then((registration) => {
+                    messaging = firebase.messaging();
+                    messaging.useServiceWorker(registration);
+                }).catch(err => console.log("SW registration failed", err));
+            }
+        } catch(e) {
+            console.log("Messaging support error", e);
+        }
+
         let isAdmin = false;
         let globalOrders = {};
         let currentStatusFilter = 'all';
         let allowNotifications = false;
 
-        // पेज खुल्नेबित्तिकै पपअप पर्मिसन अटो मागेर अन गर्ने प्रयास गर्ने
         window.addEventListener('DOMContentLoaded', () => {
             if ('Notification' in window && Notification.permission !== 'granted') {
                 Notification.requestPermission().catch(e => {});
             }
-            // ३ सेकेन्डपछि नयाँ अर्डरको लागि लाइभ साउन्ड/पपअप ट्रिगर अन हुनेछ
             setTimeout(() => {
                 allowNotifications = true;
             }, 3000);
         });
 
-        // युजरले पेजमा कहीँ पनि पहिलो क्लिक गर्नेबित्तिकै अडियो अटोमेटिक अनलक हुन्छ
         document.addEventListener('click', function unlockAudioOnce() {
             let dummyAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
             dummyAudio.play().catch(e => {});
@@ -482,22 +491,38 @@
             renderOrders();
         });
 
-        // नयाँ अर्डर आउनेबित्तिकै स्वतः साउन्ड र पपअप बज्ने
+        // एप अगाडि (Foreground) हुँदा साउन्ड, भाइब्रेसन र पपअप
         db.ref('orders').on('child_added', (snapshot) => {
             if (allowNotifications) {
                 const newOrder = snapshot.val();
                 if (newOrder) {
                     if ('Notification' in window && Notification.permission === 'granted') {
-                        new Notification("🚨 Naya Order Aayo!", {
-                            body: `Product: ${newOrder.product || newOrder.productName || 'Game Topup'} | Rs. ${newOrder.amountDue || newOrder.amount || newOrder.price || 0}`,
-                            icon: 'gaulestore.png'
-                        });
+                        // यदि एप ब्याकग्राउन्डमा छ भने सर्भिस वर्करले सम्हाल्छ, Foreground मा Notification API प्रयोग हुन्छ
+                        if (document.hidden) {
+                            navigator.serviceWorker.ready.then(registration => {
+                                registration.showNotification("🚨 Naya Order Aayo!", {
+                                    body: `Product: ${newOrder.product || newOrder.productName || 'Game Topup'} | Rs. ${newOrder.amountDue || newOrder.amount || newOrder.price || 0}`,
+                                    icon: 'gaulestore.png',
+                                    vibrate: [500, 200, 500, 200, 800]
+                                });
+                            });
+                        } else {
+                            new Notification("🚨 Naya Order Aayo!", {
+                                body: `Product: ${newOrder.product || newOrder.productName || 'Game Topup'} | Rs. ${newOrder.amountDue || newOrder.amount || newOrder.price || 0}`,
+                                icon: 'gaulestore.png'
+                            });
+                        }
                     }
+                    
                     try {
                         let audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
                         audio.play().catch(e => console.log("Audio play blocked:", e));
                     } catch(err) {
                         console.log("Audio error:", err);
+                    }
+                    
+                    if ('vibrate' in navigator) {
+                        navigator.vibrate([500, 200, 500, 200, 800]);
                     }
                 }
             }
@@ -684,6 +709,7 @@
     </script>
 </body>
 </html>
+
 
 
 
