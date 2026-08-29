@@ -219,7 +219,7 @@
                 grid-template-columns: repeat(2, 1fr);
                 gap: 12px;
             }
-            .no-data, .login-prompt-btn, .admin-notif-banner {
+            .no-data, .login-prompt-btn {
                 grid-column: span 2;
             }
         }
@@ -253,32 +253,6 @@
             font-size: 14px;
         }
         .icon-btn:hover { background: #e2e8f0; }
-
-        .admin-notif-banner {
-            margin: 12px 16px 0 16px;
-            background: #e0f2fe;
-            border: 1px solid #bae6fd;
-            padding: 10px 14px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 12px;
-            font-weight: 600;
-            color: #0369a1;
-            display: none;
-        }
-        .admin-notif-banner.active { display: flex; }
-        .admin-notif-btn {
-            background: #0284c7;
-            color: #fff;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-        }
 
         .search-bar-container {
             padding: 12px 20px 0 20px;
@@ -436,12 +410,6 @@
             </div>
         </div>
 
-        <!-- Admin Notification Banner -->
-        <div class="admin-notif-banner active" id="adminNotifBanner">
-            <span><i class="fa-solid fa-bell"></i> Enable sound & popup alerts for new orders</span>
-            <button class="admin-notif-btn" onclick="requestAdminNotificationPermission()">Turn On</button>
-        </div>
-
         <!-- Search Bar -->
         <div class="search-bar-container" id="searchBarContainer">
             <div class="search-input-wrap">
@@ -479,48 +447,28 @@
         const auth = firebase.auth();
         const db = firebase.database();
         
-        let messaging = null;
-        try {
-            if (firebase.messaging.isSupported()) {
-                messaging = firebase.messaging();
-                messaging.usePublicVapidKey("BPZPMGwxkdbhnw8ZW1wseavJy3MpoOrFqXz9QR4dCcStDQ8hPBET-QZ8E9fXvn5fg5ddC6yuf9_ICKYs2CVyO9o");
-            }
-        } catch(e) {
-            console.log("Messaging not supported or error", e);
-        }
-
         let isAdmin = false;
         let globalOrders = {};
         let currentStatusFilter = 'all';
         let allowNotifications = false;
 
-        // पेज लोड भएको ३ सेकेन्डपछि मात्र नयाँ अर्डरको लागि नोटिफिकेशन र साउन्ड अन हुनेछ (पुरानो डेटा लोड हुँदा नबजोस् भन्नको लागि)
-        setTimeout(() => {
-            allowNotifications = true;
-        }, 3000);
+        // पेज खुल्नेबित्तिकै पपअप पर्मिसन अटो मागेर अन गर्ने प्रयास गर्ने
+        window.addEventListener('DOMContentLoaded', () => {
+            if ('Notification' in window && Notification.permission !== 'granted') {
+                Notification.requestPermission().catch(e => {});
+            }
+            // ३ सेकेन्डपछि नयाँ अर्डरको लागि लाइभ साउन्ड/पपअप ट्रिगर अन हुनेछ
+            setTimeout(() => {
+                allowNotifications = true;
+            }, 3000);
+        });
 
-        function requestAdminNotificationPermission() {
-            Notification.requestPermission().then((permission) => {
-                if (permission === 'granted') {
-                    document.getElementById('adminNotifBanner').classList.remove('active');
-                    alert('Notifications enabled successfully!');
-                    
-                    // अडियो अनलक गर्नको लागि खाली अडियो प्ले गर्ने (Browser autoplay policy fix)
-                    let dummyAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-                    dummyAudio.play().catch(e => {});
-
-                    if (messaging) {
-                        messaging.getToken().then((currentToken) => {
-                            console.log('FCM Token:', currentToken);
-                        }).catch((err) => {
-                            console.log('An error occurred while retrieving token. ', err);
-                        });
-                    }
-                } else {
-                    alert('Permission denied for notifications.');
-                }
-            });
-        }
+        // युजरले पेजमा कहीँ पनि पहिलो क्लिक गर्नेबित्तिकै अडियो अटोमेटिक अनलक हुन्छ
+        document.addEventListener('click', function unlockAudioOnce() {
+            let dummyAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+            dummyAudio.play().catch(e => {});
+            document.removeEventListener('click', unlockAudioOnce);
+        }, { once: true });
 
         auth.onAuthStateChanged((user) => {
             isAdmin = (user && user.email === "gaulestore.np@gmail.com");
@@ -534,7 +482,7 @@
             renderOrders();
         });
 
-        // नयाँ अर्डर थपिँदा जुनसुकै बेला साउन्ड र पपअप बज्ने (Admin चेक हटाइएको)
+        // नयाँ अर्डर आउनेबित्तिकै स्वतः साउन्ड र पपअप बज्ने
         db.ref('orders').on('child_added', (snapshot) => {
             if (allowNotifications) {
                 const newOrder = snapshot.val();
@@ -736,6 +684,7 @@
     </script>
 </body>
 </html>
+
 
 
 
