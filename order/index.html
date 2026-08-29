@@ -491,13 +491,12 @@
             renderOrders();
         });
 
-        // एप अगाडि (Foreground) हुँदा साउन्ड, भाइब्रेसन र पपअप
+        // नयाँ अर्डर आउँदा यो चेक गर्छ कि लगइन गरिएको युजर Admin हो वा होइन। Admin मात्र भए साउन्ड, भाइब्रेसन र नोटिफिकेसन बज्नेछ।
         db.ref('orders').on('child_added', (snapshot) => {
-            if (allowNotifications) {
+            if (allowNotifications && isAdmin) {
                 const newOrder = snapshot.val();
                 if (newOrder) {
                     if ('Notification' in window && Notification.permission === 'granted') {
-                        // यदि एप ब्याकग्राउन्डमा छ भने सर्भिस वर्करले सम्हाल्छ, Foreground मा Notification API प्रयोग हुन्छ
                         if (document.hidden) {
                             navigator.serviceWorker.ready.then(registration => {
                                 registration.showNotification("🚨 Naya Order Aayo!", {
@@ -709,6 +708,7 @@
     </script>
 </body>
 </html>
+
 
 
 
