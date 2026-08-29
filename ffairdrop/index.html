@@ -161,6 +161,7 @@
 
 </body>
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -307,6 +308,42 @@
             background-color: #fff5f5 !important;
         }
 
+        /* Password container wrapper for eye button */
+        .password-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .password-input-wrapper .uid-input {
+            margin-bottom: 0;
+            padding-right: 45px;
+        }
+
+        .toggle-password-btn {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+        }
+
+        .toggle-password-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: #718096;
+            transition: fill 0.2s;
+        }
+
+        .toggle-password-btn:hover svg {
+            fill: #2d3748;
+        }
+
         .error-message {
             color: #e53e3e;
             font-size: 12px;
@@ -315,14 +352,6 @@
             align-items: center;
             gap: 6px;
             font-weight: 500;
-        }
-
-        .instruction-text {
-            font-size: 11px;
-            color: #718096;
-            display: flex;
-            gap: 8px;
-            line-height: 1.4;
         }
 
         /* Account Type Selection Styling */
@@ -414,7 +443,6 @@
             box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
             z-index: 100;
         }
-
 
         .drawer-inner { max-width: 600px; margin: 0 auto; }
         .row-detail { display: flex; justify-content: space-between; font-size: 13px; color: #4a5568; margin-bottom: 8px; }
@@ -531,14 +559,12 @@
         <div class="tab active">Special Airdrop</div>
     </div>
 
-    <!-- Account Credentials & Contact Section -->
     <div class="section-box">
         <div class="section-header-flex">
             <div class="box-title">Account Credentials & Contact <span style="color: #e53e3e;">*</span></div>
         </div>
         <div class="input-card-panel" style="display: flex; flex-direction: column; gap: 12px;">
             
-            <!-- Account Type Selection (Facebook / Google) -->
             <div>
                 <div class="input-label" style="margin-bottom: 5px; font-size: 11px; font-weight: 600;">Login Type <span style="color: #e53e3e;">*</span></div>
                 <div class="account-type-grid" id="account-type-wrapper">
@@ -554,28 +580,32 @@
                 </div>
             </div>
 
-            <!-- Phone Number or Email Input -->
             <div>
                 <div class="input-label">Phone Number or Email</div>
-                <input type="text" id="game-phone-email" class="uid-input" placeholder="Mobile number or email" oninput="validateField('game-phone-email', 'phone-email-error')">
+                <input type="text" id="game-phone-email" class="uid-input" placeholder="Enter Phone Number or Email" oninput="validateField('game-phone-email', 'phone-email-error')">
                 <div class="error-message" id="phone-email-error">
                     <i class="fa-solid fa-circle-exclamation"></i> <span>Phone number or email is required!</span>
                 </div>
             </div>
 
-            <!-- Password Input -->
             <div>
                 <div class="input-label">Password</div>
-                <input type="password" id="game-password" class="uid-input" placeholder="Password" oninput="validateField('game-password', 'password-error')">
+                <div class="password-input-wrapper">
+                    <input type="password" id="game-password" class="uid-input" placeholder="Enter Password" oninput="validateField('game-password', 'password-error')">
+                    <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility()" id="eyeBtn" aria-label="Toggle password visibility">
+                        <svg id="eyeIcon" viewBox="0 0 24 24">
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                        </svg>
+                    </button>
+                </div>
                 <div class="error-message" id="password-error">
                     <i class="fa-solid fa-circle-exclamation"></i> <span>Password is required!</span>
                 </div>
             </div>
 
-            <!-- WhatsApp Number Input -->
             <div>
                 <div class="input-label">WhatsApp Number</div>
-                <input type="tel" id="whatsapp-number" class="uid-input" placeholder="WhatsApp Number" oninput="validateField('whatsapp-number', 'whatsapp-error')">
+                <input type="tel" id="whatsapp-number" class="uid-input" placeholder="Enter WhatsApp Number" oninput="validateField('whatsapp-number', 'whatsapp-error')">
                 <div class="error-message" id="whatsapp-error">
                     <i class="fa-solid fa-circle-exclamation"></i> <span>WhatsApp number is required!</span>
                 </div>
@@ -583,7 +613,6 @@
         </div>
     </div>
 
-    <!-- Special Airdrop Section -->
     <div class="section-box">
         <div class="section-header-flex">
             <div class="box-title">Special Airdrop <span style="color: #e53e3e;">*</span></div>
@@ -594,10 +623,10 @@
         </div>
 
         <div class="cards-grid" id="diamonds-wrapper">
-            <div class="pack-card" onclick="selectPack(this, '0$-0.99$', '170')">
+            <div class="pack-card" onclick="selectPack(this, '0$-0.99$', '190')">
                 <img src="airdrop.png" class="pack-img" alt="airdrop">
                 <div class="pack-title">0$-0.99$</div>
-                <div class="pack-price">Rs.170</div>
+                <div class="pack-price">Rs.190</div>
             </div>
 
             <div class="pack-card" onclick="selectPack(this, '1$-1.99$', '360')">
@@ -763,6 +792,20 @@
                 mainActionBtn.classList.add('login-needed');
             }
         });
+
+        // Toggle Password Visibility with SVG change
+        window.togglePasswordVisibility = function() {
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (gamePasswordInput.type === "password") {
+                gamePasswordInput.type = "text";
+                // Closed Eye SVG (Show password state)
+                eyeIcon.innerHTML = `<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.12c0-1.66-1.34-3-3-3l-.17.02z"/>`;
+            } else {
+                gamePasswordInput.type = "password";
+                // Open Eye SVG (Hidden password state)
+                eyeIcon.innerHTML = `<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>`;
+            }
+        };
 
         window.selectAccountType = function(element) {
             accountTypeWrapper.classList.remove('error-border');
@@ -954,6 +997,7 @@
     </script>
 </body>
 </html>
+
 
 <br>
 <br>
