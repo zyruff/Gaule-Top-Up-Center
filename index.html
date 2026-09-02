@@ -774,6 +774,8 @@
         Write a Review
     </button>
      
+
+     
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -977,8 +979,6 @@ onValue(ref(db,"reviews"),(snapshot)=>{
 </script>
 
 
-
-
 <div id="reviews-container" style="width: 100%; font-family: 'Poppins', sans-serif;">
     <div id="reviews" style="display: flex; flex-direction: column; gap: 12px; width: 100%;"></div>
 
@@ -1112,7 +1112,9 @@ function renderReviews() {
         <div style="margin-top: 10px; padding: 10px 14px; background: #f8fafc; border-radius: 10px; font-size: 13px; width: 100%; box-sizing: border-box;">
             <div style="display:flex; align-items:center; gap:6px; margin-bottom: 4px;">
                 <img src="owner.png" style="width:20px; height:20px; border-radius:50%; object-fit:cover;">
-                <span style="font-weight:600; font-size:11px; color:#065fd4; display:flex; align-items:center;">GAULE STORE ${blueBadge}</span>
+                <span style="font-weight:600; font-size:11px; color:#065fd4; display:flex; align-items:center;">
+                    <span style="color:#111111;">GAULE</span><span style="color:#ef4444; margin-left:3px;">STORE</span> ${blueBadge}
+                </span>
             </div>
             <div style="color: #334155; line-height: 1.4;">${review.reply}</div>
         </div>` : "";
@@ -1172,6 +1174,10 @@ onValue(ref(db, "reviews"), (snapshot) => {
     renderReviews();
 });
 </script>
+
+
+
+
 
      <br>
 
