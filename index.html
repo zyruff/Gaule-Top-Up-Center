@@ -1064,21 +1064,19 @@ onValue(ref(db,"reviews"),(snapshot)=>{
 
 
 
+<div id="reviews-container" style="width: 100%; font-family: 'Poppins', sans-serif;">
+    <div id="reviews" style="display: flex; flex-direction: column; gap: 12px; width: 100%;"></div>
 
-
-
-
-<div id="reviews"></div>
-
-<div style="text-align:center;margin-top:10px;">
-    <button id="moreBtn" style="background:#fff; padding:10px; margin:6px 0; border-radius:10px; border:none; box-shadow:0 1px 4px rgba(0,0,0,.08); cursor:pointer; display:none;">
-        More Reviews
-    </button>
+    <div style="text-align:center; margin-top: 15px;">
+        <button id="moreBtn" style="background: #ffffff; color: #111; padding: 10px 24px; font-size: 13px; font-weight: 600; border-radius: 30px; border: 1px solid #e5e7eb; box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer; display: none;">
+            More Reviews
+        </button>
+    </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
@@ -1101,10 +1099,72 @@ let allReviews = [];
 
 window.sendReply = (reviewId) => {
     const replyText = prompt("रिप्लाई लेख्नुहोस्:");
-    if (replyText) {
-        update(ref(db, 'reviews/' + reviewId), { reply: replyText });
+    if (replyText !== null && replyText.trim() !== "") {
+        update(ref(db, 'reviews/' + reviewId), { reply: replyText.trim() });
     }
 };
+
+window.deleteReview = (reviewId) => {
+    if (confirm("के you यो review मेटाउन चाहनुहुन्छ?")) {
+        remove(ref(db, 'reviews/' + reviewId));
+    }
+};
+
+function timeAgo(timestamp) {
+    if (!timestamp) return "";
+    
+    let timeMs;
+    if (typeof timestamp === 'number') {
+        timeMs = timestamp < 10000000000 ? timestamp * 1000 : timestamp;
+    } else if (typeof timestamp === 'string') {
+        const match = timestamp.match(/(\d{2})\/(\d{2})\/(\d{4}),?\s*(\d{2}):(\d{2}):(\d{2})/);
+        if (match) {
+            const day = parseInt(match[1], 10);
+            const month = parseInt(match[2], 10) - 1;
+            const year = parseInt(match[3], 10);
+            const hour = parseInt(match[4], 10);
+            const minute = parseInt(match[5], 10);
+            const second = parseInt(match[6], 10);
+            timeMs = new Date(year, month, day, hour, minute, second).getTime();
+        } else {
+            const parsed = Date.parse(timestamp);
+            timeMs = isNaN(parsed) ? Date.now() : parsed;
+        }
+    } else {
+        timeMs = Date.now();
+    }
+
+    if (isNaN(timeMs)) return "";
+
+    const seconds = Math.floor((Date.now() - timeMs) / 1000);
+    if (seconds < 15) return "Just now";
+    
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + (Math.floor(interval) === 1 ? " year ago" : " years ago");
+    
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + (Math.floor(interval) === 1 ? " month ago" : " months ago");
+    
+    interval = seconds / 86400;
+    if (interval > 1) {
+        const days = Math.floor(interval);
+        return days === 1 ? "1 day ago" : days + " days ago";
+    }
+    
+    interval = seconds / 3600;
+    if (interval > 1) {
+        const hours = Math.floor(interval);
+        return hours === 1 ? "1 hour ago" : hours + " hours ago";
+    }
+    
+    interval = seconds / 60;
+    if (interval > 1) {
+        const minutes = Math.floor(interval);
+        return minutes === 1 ? "1 minute ago" : minutes + " minutes ago";
+    }
+    
+    return seconds + " seconds ago";
+}
 
 function isUserAlreadyVerified(userId, email) {
     if (email === "gaulestore.np@gmail.com") return true;
@@ -1122,38 +1182,60 @@ function renderReviews() {
     reviewsDiv.innerHTML = "";
     const reviewsToShow = showAll ? allReviews : allReviews.slice(0, 3);
     
-    // नीलो र कालो ब्याडज
-    const blueBadge = `<svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:#065fd4; margin-left:4px;"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zM9.8 17.3l-4.2-4.2 1.4-1.4 2.8 2.8 7.3-7.3 1.4 1.4-8.7 8.7z"></path></svg>`;
-    const blackBadge = `<svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:#000000; margin-left:4px;"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zM9.8 17.3l-4.2-4.2 1.4-1.4 2.8 2.8 7.3-7.3 1.4 1.4-8.7 8.7z"></path></svg>`;
+    const blueBadge = `<svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:#065fd4; margin-left:4px; flex-shrink: 0;"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zM9.8 17.3l-4.2-4.2 1.4-1.4 2.8 2.8 7.3-7.3 1.4 1.4-8.7 8.7z"></path></svg>`;
+    const blackBadge = `<svg viewBox="0 0 24 24" style="width:14px; height:14px; fill:#111111; margin-left:4px; flex-shrink: 0;"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zM9.8 17.3l-4.2-4.2 1.4-1.4 2.8 2.8 7.3-7.3 1.4 1.4-8.7 8.7z"></path></svg>`;
 
     reviewsToShow.forEach(review => {
-        const photo = review.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.name || "U")}`;
+        const photo = review.photo || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.name || "U")}&background=e2e8f0&color=1e293b`;
         const isOwner = review.email === "gaulestore.np@gmail.com";
         const alreadyVerified = isUserAlreadyVerified(review.userId, review.email);
-        const starsDisplay = `<span style="color:#f4b400; font-size:14px;">${"★".repeat(Number(review.stars || 5))}</span>`;
+        const starCount = Number(review.stars || 5);
+        const starsDisplay = `<span style="color:#f59e0b; font-size:12px; letter-spacing: 2px;">${"★".repeat(starCount)}</span>`;
+        const timeDisplay = timeAgo(review.timestamp);
         
-        // ओनर रिप्लाई सेक्सन: GAULE STORE र Blue Badge
         const replySection = review.reply ? `
-        <div style="margin-top:8px; padding:8px; background:#f4f4f4; border-radius:8px; font-size:13px;">
-            <div style="display:flex; align-items:center; gap:6px; margin-bottom:5px;">
-                <img src="owner.png" style="width:25px; height:25px; border-radius:50%; object-fit:cover;">
-                <span style="font-weight:bold; display:flex; align-items:center;">GAULE STORE ${blueBadge}</span>
+        <div style="margin-top: 10px; padding: 10px 14px; background: #f8fafc; border-radius: 10px; font-size: 13px; width: 100%; box-sizing: border-box;">
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom: 4px;">
+                <img src="owner.png" style="width:20px; height:20px; border-radius:50%; object-fit:cover;">
+                <span style="font-weight:600; font-size:11px; color:#065fd4; display:flex; align-items:center;">GAULE STORE ${blueBadge}</span>
             </div>
-            ${review.reply}
+            <div style="color: #334155; line-height: 1.4;">${review.reply}</div>
+        </div>` : "";
+
+        // Premium Admin Panel UI
+        const adminPanel = isAdmin ? `
+        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed #e2e8f0;">
+            <button onclick="sendReply('${review.id}')" style="display: flex; align-items: center; gap: 5px; padding: 6px 14px; font-size: 11px; font-weight: 600; cursor: pointer; background: linear-gradient(135deg, #0ea5e9, #0284c7); color: #fff; border: none; border-radius: 8px; box-shadow: 0 2px 6px rgba(14, 165, 233, 0.25); transition: opacity 0.2s;">
+                <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: #ffffff;"><path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+                ${review.reply ? 'Edit Reply' : 'Reply'}
+            </button>
+            <button onclick="deleteReview('${review.id}')" style="display: flex; align-items: center; gap: 5px; padding: 6px 12px; font-size: 11px; font-weight: 600; cursor: pointer; background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; border: none; border-radius: 8px; box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25); transition: opacity 0.2s;">
+                <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: #ffffff;"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                Delete
+            </button>
         </div>` : "";
 
         reviewsDiv.innerHTML += `
-        <div style="background:#fff; padding:10px; margin:6px 0; border-radius:10px; box-shadow:0 1px 4px rgba(0,0,0,.08);">
-            <div style="display:flex; align-items:center; gap:8px;">
-                <img src="${photo}" style="width:35px; height:35px; border-radius:50%; object-fit:cover;">
-                <div style="font-size:13px; font-weight:bold; display:flex; align-items:center;">
-                    ${review.name || "User"} ${alreadyVerified ? (isOwner ? blueBadge : blackBadge) : ""}
+        <div style="background: #ffffff; border: 1px solid #f1f5f9; padding: 16px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04); width: 100%; box-sizing: border-box;">
+            <div style="display:flex; align-items:flex-start; justify-content: space-between; gap: 10px;">
+                <div style="display:flex; align-items:center; gap: 10px;">
+                    <img src="${photo}" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 1px solid #e2e8f0;">
+                    <div>
+                        <div style="font-size: 14px; font-weight: 600; color: #0f172a; display: flex; align-items: center;">
+                            ${review.name || "User"} ${alreadyVerified ? (isOwner ? blueBadge : blackBadge) : ""}
+                        </div>
+                        <div style="margin-top: 2px;">${starsDisplay}</div>
+                    </div>
+                </div>
+                <div style="font-size: 11px; color: #94a3b8; white-space: nowrap; margin-top: 2px;">
+                    ${timeDisplay}
                 </div>
             </div>
-            <div style="margin-top:4px;">${starsDisplay}</div>
-            <div style="margin-top:4px; font-size:13px;">${review.comment || ""}</div>
+            <div style="margin-top: 10px; font-size: 13px; color: #475569; line-height: 1.5; word-break: break-word;">
+                ${review.comment || ""}
+            </div>
             ${replySection}
-            ${isAdmin ? `<button onclick="sendReply('${review.id}')" style="margin-top:8px; padding:4px 8px; font-size:10px; cursor:pointer; background:#000; color:#fff; border:none; border-radius:4px;">Reply</button>` : ""}
+            ${adminPanel}
         </div>
         `;
     });
@@ -1176,19 +1258,10 @@ onValue(ref(db, "reviews"), (snapshot) => {
 });
 </script>
 
-<!-- यो कोडले गुगललाई तपाईंको रेटिङको बारेमा जानकारी दिन्छ -->
-<script type="application/ld+json" id="schema-script">
-{
-  "@context": "https://schema.org/",
-  "@type": "Product",
-  "name": "Gaule Top Up Center",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "5.0", 
-    "reviewCount": "1"
-  }
-}
-</script>
+     <br>
+
+
+
 
 
 
