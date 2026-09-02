@@ -550,31 +550,27 @@
             padding: 0; 
             border-radius: 0; 
             box-shadow: none; 
+            overflow-x: auto; /* Lamo text huda layout bigrina nadina */
         }
         
         table { 
             width: 100%; 
             border-collapse: collapse; 
-            font-size: 11px; /* Mobile ko lagi font size ali standard banako */
-            table-layout: fixed; /* Column width control garna */
-        }
-        th, td { 
-            padding: 10px 6px; 
-            word-break: break-word;
-            overflow-wrap: break-word;
+            font-size: 11px; 
         }
         
-        /* Column widths allocation (Total 100%) */
-        th:nth-child(1), td:nth-child(1) { width: 25%; text-align: left; } /* Name */
-        th:nth-child(2), td:nth-child(2) { width: 28%; text-align: left; } /* Product */
-        th:nth-child(3), td:nth-child(3) { width: 25%; text-align: left; } /* Date */
-        th:nth-child(4), td:nth-child(4) { width: 22%; text-align: center; } /* Status */
+        th, td { 
+            padding: 10px 6px; 
+            white-space: nowrap; /* Text lai tala line ma jarna dinna, ekai line ma rakhaxa */
+            text-align: left;
+        }
 
         th { 
             background: #333; 
             color: white; 
             font-size: 11px;
         }
+        
         td { 
             border-bottom: 1px solid #eee; 
         }
@@ -596,8 +592,8 @@
                 box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
                 padding: 15px;
             }
-            table { font-size: 14px; table-layout: auto; }
-            th, td { padding: 12px 10px; }
+            table { font-size: 14px; }
+            th, td { padding: 12px 12px; }
             h3 { 
                 text-align: center; 
                 background: transparent;
@@ -617,7 +613,7 @@
                     <th>Name</th>
                     <th>Product</th>
                     <th>Date</th>
-                    <th style="text-align: center;">Status</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody id="orderTableBody">
@@ -688,7 +684,7 @@
                     <td>${o.name}</td>
                     <td>${o.product}</td>
                     <td>${getTimeAgo(o.timestamp)}</td>
-                    <td style="color: ${statusColor}; font-weight: bold; text-align: center;">${o.status.toUpperCase()}</td>
+                    <td style="color: ${statusColor}; font-weight: bold;">${o.status.toUpperCase()}</td>
                 </tr>
             `;
         });
