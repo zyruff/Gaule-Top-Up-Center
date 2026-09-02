@@ -519,8 +519,6 @@
 
 
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -535,64 +533,74 @@
         }
         body { 
             font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            padding: 20px; 
+            padding: 0; 
             background: #f9f9f9; 
         }
         
         .main-wrapper {
             width: 100%;
-            max-width: 1000px; /* Desktop ma dherai sano nadekhos vanera maximum limit */
+            max-width: 1200px; 
             margin: 0 auto;
         }
 
         .table-container { 
             width: 100%; 
             background: white; 
-            padding: 15px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
-            overflow-x: auto; 
+            padding: 0; 
+            border-radius: 0; 
+            box-shadow: none; 
         }
         
         table { 
             width: 100%; 
             border-collapse: collapse; 
-            font-size: 14px; /* Desktop ko lagi font ali thulo */
+            font-size: 12px; 
         }
         th { 
             background: #333; 
             color: white; 
-            padding: 12px 10px; 
+            padding: 10px 8px; 
             text-align: left; 
-            white-space: nowrap; 
+            word-break: break-word;
         }
         td { 
-            padding: 12px 10px; 
+            padding: 10px 8px; 
             border-bottom: 1px solid #eee; 
-            white-space: nowrap; 
+            word-break: break-word; /* Mobile ma text lamo vaye tala jaxa */
         }
         
         h3 { 
-            text-align: center; 
+            text-align: left; 
             color: #333; 
-            font-size: 20px; 
-            margin-bottom: 15px; 
+            font-size: 16px; 
+            padding: 10px 12px;
+            background: #fff;
+            border-bottom: 1px solid #ddd;
         }
 
-        /* Responsive styling for mobile devices */
-        @media (max-width: 600px) {
-            body { padding: 10px; }
-            table { font-size: 11px; }
-            th, td { padding: 8px 5px; }
-            h3 { font-size: 16px; }
+        /* Desktop view ko lagi */
+        @media (min-width: 768px) {
+            body { padding: 20px; }
+            .table-container { 
+                border-radius: 12px; 
+                box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+                padding: 15px;
+            }
+            table { font-size: 14px; }
+            th, td { padding: 12px 10px; white-space: nowrap; }
+            h3 { 
+                text-align: center; 
+                background: transparent;
+                border-bottom: none;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="main-wrapper">
-    <h3>Order Status</h3>
     <div class="table-container">
+        <h3>Order Status</h3>
         <table>
             <thead>
                 <tr>
@@ -658,11 +666,11 @@
         const ordersArray = Object.keys(data).map(key => data[key]);
         const recentOrders = ordersArray.reverse().slice(0, 10);
         
-        recentOrders.forEach(o => {
+        recentOrders.cwd = recentOrders.forEach(o => {
             let statusColor = '#999';
             if (o.status.toLowerCase() === 'pending') statusColor = '#FFC107';
             else if (o.status.toLowerCase() === 'rejected') statusColor = '#F44336';
-            else if (o.status.toLowerCase() === 'complete') statusColor, statusColor = '#4CAF50';
+            else if (o.status.toLowerCase() === 'complete') statusColor = '#4CAF50';
             
             tbody.innerHTML += `
                 <tr>
@@ -677,6 +685,8 @@
 </script>
 </body>
 </html>
+
+                    
 
     
 
