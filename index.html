@@ -519,6 +519,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -554,19 +555,28 @@
         table { 
             width: 100%; 
             border-collapse: collapse; 
-            font-size: 12px; 
+            font-size: 11px; /* Mobile ko lagi font size ali standard banako */
+            table-layout: fixed; /* Column width control garna */
         }
+        th, td { 
+            padding: 10px 6px; 
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        /* Column widths allocation (Total 100%) */
+        th:nth-child(1), td:nth-child(1) { width: 25%; text-align: left; } /* Name */
+        th:nth-child(2), td:nth-child(2) { width: 28%; text-align: left; } /* Product */
+        th:nth-child(3), td:nth-child(3) { width: 25%; text-align: left; } /* Date */
+        th:nth-child(4), td:nth-child(4) { width: 22%; text-align: center; } /* Status */
+
         th { 
             background: #333; 
             color: white; 
-            padding: 10px 8px; 
-            text-align: left; 
-            word-break: break-word;
+            font-size: 11px;
         }
         td { 
-            padding: 10px 8px; 
             border-bottom: 1px solid #eee; 
-            word-break: break-word; /* Mobile ma text lamo vaye tala jaxa */
         }
         
         h3 { 
@@ -586,8 +596,8 @@
                 box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
                 padding: 15px;
             }
-            table { font-size: 14px; }
-            th, td { padding: 12px 10px; white-space: nowrap; }
+            table { font-size: 14px; table-layout: auto; }
+            th, td { padding: 12px 10px; }
             h3 { 
                 text-align: center; 
                 background: transparent;
@@ -607,7 +617,7 @@
                     <th>Name</th>
                     <th>Product</th>
                     <th>Date</th>
-                    <th>Status</th>
+                    <th style="text-align: center;">Status</th>
                 </tr>
             </thead>
             <tbody id="orderTableBody">
@@ -666,18 +676,19 @@
         const ordersArray = Object.keys(data).map(key => data[key]);
         const recentOrders = ordersArray.reverse().slice(0, 10);
         
-        recentOrders.cwd = recentOrders.forEach(o => {
+        recentOrders.forEach(o => {
             let statusColor = '#999';
             if (o.status.toLowerCase() === 'pending') statusColor = '#FFC107';
             else if (o.status.toLowerCase() === 'rejected') statusColor = '#F44336';
             else if (o.status.toLowerCase() === 'complete') statusColor = '#4CAF50';
+            else if (o.status.toLowerCase() === 'refunded') statusColor = '#9E9E9E';
             
             tbody.innerHTML += `
                 <tr>
                     <td>${o.name}</td>
                     <td>${o.product}</td>
                     <td>${getTimeAgo(o.timestamp)}</td>
-                    <td style="color: ${statusColor}; font-weight: bold;">${o.status.toUpperCase()}</td>
+                    <td style="color: ${statusColor}; font-weight: bold; text-align: center;">${o.status.toUpperCase()}</td>
                 </tr>
             `;
         });
