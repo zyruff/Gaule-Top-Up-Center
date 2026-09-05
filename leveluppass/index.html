@@ -271,85 +271,6 @@
             line-height: 1.4;
         }
 
-        /* --- PACKS GRID --- */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            padding: 4px;
-            border-radius: 14px;
-            border: 2px solid transparent;
-            transition: all 0.2s ease;
-            margin-bottom: 12px;
-        }
-
-        .cards-grid.error-border {
-            border: 2px solid #e53e3e !important;
-            background-color: #fff5f5;
-            padding: 8px;
-        }
-
-        .pack-card {
-            aspect-ratio: 1 / 1;
-            background-color: #ffffff;
-            border: 2px solid #e2e8f0;
-            border-radius: 18px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-            transition: transform 0.1s, border-color 0.2s;
-        }
-
-        .pack-card:active { transform: scale(0.98); }
-        .pack-card.selected { border: 2px solid #ecc94b !important; background-color: #fffcf0; }
-        
-        /* --- IMAGE FIX (Medium & Centered) --- */
-        .pack-img-container {
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            margin: 4px 0;
-        }
-
-        .pack-img {
-            width: 65px; 
-            height: 65px;
-            object-fit: contain;
-            display: block;
-        }
-
-        .pack-info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-        }
-
-        .pack-title { 
-            font-size: 12px; 
-            font-weight: 700; 
-            margin-bottom: 2px; 
-            color: #1a202c; 
-            text-align: center;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            width: 100%;
-        }
-        
-        .pack-price { 
-            font-size: 14px; 
-            font-weight: 700; 
-            color: #e53e3e; 
-        }
-
         /* --- DRAWER --- */
         .bottom-drawer {
             position: fixed;
@@ -454,14 +375,14 @@
  
    <div class="banner-container">
         <div class="badges-wrapper">
-            <div class="badge instant"><i class="fa-solid fa-bolt"></i> 1 min - 5 min Delivery</div>
+            <div class="badge instant"> 1 min - 5 min Delivery</div>
             <div class="badge official"><i class="fa-solid fa-circle-check"></i> Official Supply</div>
         </div>
         <div class="banner-flex">
             <img class="avatar-img" src="levelup.png" alt="Level Up Pass">
             <div>
-                <div class="badge Region" style="background: #edf2f7; display: inline-block; margin-bottom: 4px;">Nepal/Bangladesh</div>
-                <p class="banner-desc">Buy Garena Free Fire Level Up Pass in Nepal at the cheapest price with Gaule Store.</p>
+                <div class="badge Region">Nepal/Bangladesh </div>
+                <p class="banner-desc">Buy Garena Fire Level Up Pass in Nepal at the cheapest price with Gaule Store.</p>
             </div>
         </div>
     </div>
@@ -476,8 +397,9 @@
         </div>
         <div class="input-card-panel">
             <div class="input-label">Your Game ID (UID)</div>
-            <input type="text" id="game-uid" class="uid-input" placeholder="Enter Game ID.." oninput="validateUIDAuto()">
+            <input type="text" id="game-uid" class="uid-input" placeholder=" PLAYER ID (UID)" oninput="validateUIDAuto()">
 
+            <!-- Auto Player Name Display Box -->
             <div id="player-name-display" style="margin-top: 10px; padding: 10px; border-radius: 8px; background: #f0fff4; border: 1px solid #9ae6b4; display: none;">
                 <i class="fa-solid fa-user-check" style="color: #22543d;"></i> 
                 <span id="player-name" style="font-weight: 600; color: #22543d; font-size: 14px;">Searching...</span>
@@ -496,82 +418,124 @@
 
     <div class="section-box">
         <div class="section-header-flex">
-            <div class="box-title">Level Up Pass <span style="color: #e53e3e;">*</span></div>
+            <div class="box-title">Level Up Pass<span style="color: #e53e3e;">*</span></div>
         </div>
         
         <div class="error-message" id="pack-error" style="margin-bottom: 8px; display: none;">
             <i class="fa-solid fa-circle-exclamation"></i> <span>Please select a Level Up Pass!</span>
         </div>
 
-        <div class="cards-grid" id="packs-wrapper">
+      
+<style>
+    .section-box { margin: 15px 15; }
+    .box-title { font-weight: bold; margin-bottom: 10px; padding-left: 5px; }
+    
+    /* PC र Mobile दुवैमा मिल्ने Grid Layout */
+    .cards-grid { 
+        display: grid; 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 12px; 
+        margin-bottom: 12px; 
+    }
+
+    /* PC वा ठूलो स्क्रिन (768px भन्दा ठूलो) का लागि ४ वटा स्तम्भ देखाउने */
+    @media (min-width: 768px) {
+        .cards-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .cards-grid.error-border { 
+        border: 2px solid #e53e3e !important; 
+        background-color: #fff5f5; 
+        padding: 8px; 
+        border-radius: 14px; 
+    }
+    
+    .pack-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 10px;
+        border: 2px solid #e2e8f0;
+        border-radius: 14px;
+        background: #ffffff;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    
+    .pack-card.selected { 
+        border-color: #ecc94b !important; 
+        background-color: #fffcf0; 
+    }
+    
+    .pack-img { 
+        width: 80%; 
+        max-height: 80px; 
+        object-fit: contain; 
+        margin-bottom: 8px; 
+    }
+    
+    .pack-title { 
+        font-weight: bold; 
+        font-size: 13px; 
+        margin-bottom: 2px; 
+        text-align: center; 
+    }
+    
+    .pack-price { 
+        color: #e53e3e; 
+        font-weight: bold; 
+        font-size: 14px; 
+    }
+</style>
+
+
+
+            
+
+        <div class="cards-grid" id="diamonds-wrapper">
             <div class="pack-card" onclick="selectPack(this, '6 Level Package', '100')">
-                <div class="pack-img-container">
-                    <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
-                </div>
-                <div class="pack-info">
-                    <div class="pack-title">6 Level Package</div>
-                    <div class="pack-price">Rs.100</div>
-                </div>
+                <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
+                <div class="pack-title">6 Level Package</div>
+                <div class="pack-price">Rs.100</div>
             </div>
 
             <div class="pack-card" onclick="selectPack(this, '10 Level Package', '100')">
-                <div class="pack-img-container">
-                    <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
-                </div>
-                <div class="pack-info">
-                    <div class="pack-title">10 Level Package</div>
-                    <div class="pack-price">Rs.100</div>
-                </div>
+                <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
+                <div class="pack-title">10 Level Package</div>
+                <div class="pack-price">Rs.100</div>
             </div>
 
             <div class="pack-card" onclick="selectPack(this, '15 Level Package', '100')">
-                <div class="pack-img-container">
-                    <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
-                </div>
-                <div class="pack-info">
-                    <div class="pack-title">15 Level Package</div>
-                    <div class="pack-price">Rs.100</div>
-                </div>
+                <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
+                <div class="pack-title">15 Level Package</div>
+                <div class="pack-price">Rs.100</div>
             </div>
 
             <div class="pack-card" onclick="selectPack(this, '20 Level Package', '100')">
-                <div class="pack-img-container">
-                    <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
-                </div>
-                <div class="pack-info">
-                    <div class="pack-title">20 Level Package</div>
-                    <div class="pack-price">Rs.100</div>
-                </div>
+                <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
+                <div class="pack-title">20 Level Package</div>
+                <div class="pack-price">Rs.100</div>
             </div>
 
             <div class="pack-card" onclick="selectPack(this, '25 Level Package', '100')">
-                <div class="pack-img-container">
-                    <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
-                </div>
-                <div class="pack-info">
-                    <div class="pack-title">25 Level Package</div>
-                    <div class="pack-price">Rs.100</div>
-                </div>
+                <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
+                <div class="pack-title">25 Level Package</div>
+                <div class="pack-price">Rs.100</div>
             </div>
 
             <div class="pack-card" onclick="selectPack(this, '30 Level Package', '130')">
-                <div class="pack-img-container">
-                    <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
-                </div>
-                <div class="pack-info">
-                    <div class="pack-title">30 Level Package</div>
-                    <div class="pack-price">Rs.130</div>
-                </div>
+                <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
+                <div class="pack-title">30 Level Package</div>
+                <div class="pack-price">Rs.130</div>
             </div>
 
             <div class="pack-card" onclick="selectPack(this, 'All Package 6-30.Lv', '550')">
-                <div class="pack-img-container">
-                    <img src="leveluppass.png" class="pack-img" alt="All Level Pass">
-                </div>
-                <div class="pack-info">
-                    <div class="pack-title">All Package 6-30.Lv</div>
-                    <div class="pack-price">Rs.550</div>
-                </div>
+                <img src="leveluppass.png" class="pack-img" alt="All Level Pass">
+                <div class="pack-title">All Package 6-30.Lv</div>
+                <div class="pack-price">Rs.550</div>
             </div>
         </div>
     </div>
@@ -700,7 +664,7 @@
         const gameUidInput = document.getElementById('game-uid');
         const uidError = document.getElementById('uid-error');
         const packError = document.getElementById('pack-error');
-        const packsWrapper = document.getElementById('packs-wrapper');
+        const diamondsWrapper = document.getElementById('diamonds-wrapper');
         const txidInput = document.getElementById('txid');
         const txidError = document.getElementById('txid-error');
 
@@ -777,9 +741,9 @@
             let isFormValid = true;
 
             if (!selectedItemName) {
-                packsWrapper.classList.add('error-border');
+                diamondsWrapper.classList.add('error-border');
                 packError.style.display = "flex";
-                packsWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                diamondsWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 isFormValid = false;
             }
 
@@ -796,7 +760,7 @@
         };
 
         window.selectPack = function(element, name, price) {
-            packsWrapper.classList.remove('error-border');
+            diamondsWrapper.classList.remove('error-border');
             packError.style.display = "none";
 
             document.querySelectorAll('.pack-card').forEach(card => card.classList.remove('selected'));
@@ -872,7 +836,7 @@
                 product: selectedItemName,
                 amountDue: selectedItemPrice,
                 uid: uidValue,
-                playerName: fetchedPlayerName,
+                playerName: fetchedPlayerName, // <-- यो लाइनबाट Database मा Player Name सेभ हुन्छ
                 transactionId: txidValue,
                 status: "Pending"
             }).then(() => {
@@ -900,6 +864,7 @@
     </script>
 </body>
 </html>
+
 
 
 
