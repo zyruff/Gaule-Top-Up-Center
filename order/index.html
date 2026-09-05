@@ -414,7 +414,7 @@
         <div class="search-bar-container" id="searchBarContainer">
             <div class="search-input-wrap">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="orderSearchInput" class="search-input" placeholder="Search Product, Email, UID, Zone ID, Txn ID..." onkeyup="renderOrders()">
+                <input type="text" id="orderSearchInput" class="search-input" placeholder="Search Product, Email, UID, Player Name, Txn ID..." onkeyup="renderOrders()">
             </div>
         </div>
 
@@ -491,7 +491,6 @@
             renderOrders();
         });
 
-        // नयाँ अर्डर आउँदा यो चेक गर्छ कि लगइन गरिएको युजर Admin हो वा होइन। Admin मात्र भए साउन्ड, भाइब्रेसन र नोटिफिकेसन बज्नेछ।
         db.ref('orders').on('child_added', (snapshot) => {
             if (allowNotifications && isAdmin) {
                 const newOrder = snapshot.val();
@@ -592,6 +591,7 @@
                 if (!isAdmin && !isOwner) return;
 
                 const displayUID = (order.uid && order.uid.length < 20) ? order.uid : (order.playerId || order.gameId || order.playerUID || '');
+                const displayPlayerName = order.playerName || '';
                 const displayZoneId = order.zoneid || order.zoneId || order.zone || order.server || order.zoneID || '';
                 const displayEmail = order.email || order.userEmail || '';
                 const productTitle = order.product || order.productName || order.title || 'Game Topup';
@@ -605,7 +605,7 @@
                 const transactionId = order.transactionId || order.txnId || order.transactionID || '';
 
                 const matchesStatus = (currentStatusFilter === 'all' || orderStatus === currentStatusFilter || (currentStatusFilter === 'complete' && (orderStatus === 'completed' || orderStatus === 'complete')));
-                const searchString = `${orderIdStr} ${productTitle} ${displayEmail} ${displayUID} ${displayZoneId} ${orderAmount} ${order.redeemCode || ''} ${transactionId} ${orderDateStr}`.toLowerCase();
+                const searchString = `${orderIdStr} ${productTitle} ${displayEmail} ${displayUID} ${displayPlayerName} ${displayZoneId} ${orderAmount} ${order.redeemCode || ''} ${transactionId} ${orderDateStr}`.toLowerCase();
                 const matchesSearch = searchString.includes(searchQuery);
 
                 if (matchesStatus && matchesSearch) {
@@ -626,6 +626,7 @@
                                 ${orderDateStr ? `<div class="info-row"><i class="fa-solid fa-calendar-days"></i> ${orderDateStr}</div>` : ''}
                                 ${displayEmail ? `<div class="info-row"><i class="fa-solid fa-envelope"></i> ${displayEmail}</div>` : ''}
                                 ${displayUID ? `<div class="info-row"><i class="fa-solid fa-gamepad"></i> UID: <b>${displayUID}</b></div>` : ''}
+                                ${displayPlayerName && displayPlayerName !== "Unknown" ? `<div class="info-row"><i class="fa-solid fa-user-check"></i> Player: <b style="color: #0284c7;">${displayPlayerName}</b></div>` : ''}
                                 ${displayZoneId ? `<div class="info-row"><i class="fa-solid fa-server"></i> Zone ID: <b>${displayZoneId}</b></div>` : ''}
                                 ${order.redeemCode ? `<div class="info-row" style="color:#2563eb;"><i class="fa-solid fa-key"></i> Code: <b>${order.redeemCode}</b></div>` : ''}
                                 
@@ -708,6 +709,7 @@
     </script>
 </body>
 </html>
+
 
 
 
