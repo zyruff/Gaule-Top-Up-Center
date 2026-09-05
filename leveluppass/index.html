@@ -1,10 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <link rel="canonical" href="https://roshantamang2.com.np/" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Open Graph Tags (Facebook, WhatsApp Preview को लागि) -->
+    <meta property="og:title" content="Gaule Store - Buy Level Up Pass in Nepal" />
+    <meta property="og:description" content="Buy Free Fire Level Up Pass in Nepal at the cheapest price with Gaule Store. 1-5 min instant delivery." />
+    <meta property="og:image" content="https://roshantamang2.com.np/leveluppass/levelup.png" />
+    <meta property="og:url" content="https://roshantamang2.com.np/leveluppass/" />
+    <meta property="og:type" content="website" />
+
+    <!-- Twitter Preview को लागि (वैकल्पिक) -->
+    <meta name="twitter:card" content="summary_large_image" />
     <title>Gaule Store</title>
+
     <style>
         body { font-family: sans-serif; margin: 0; background-color: #f4f4f4; }
         .header { display: flex; align-items: center; padding: 15px; background: white; border-bottom: 2px solid #dc2626; justify-content: space-between; }
@@ -22,7 +31,6 @@
         .change-name { font-size: 11px; color: #dc2626; text-decoration: none; display: block; margin-bottom: 15px; }
         .logout-btn { background: #dc2626; color: white; border: none; padding: 8px 20px; cursor: pointer; border-radius: 4px; }
         #nav-menu a { display: block; padding: 12px 0; color: black; text-decoration: none; border-bottom: 1px solid #eee; }
-        .order-card { background: white; border-left: 5px solid #dc2626; padding: 10px; margin-bottom: 8px; border-radius: 5px; box-shadow: 0 2px 5px #ddd; }
         .store-title { font-size: 1.5rem; font-weight: bold; }
         .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; }
     </style>
@@ -46,13 +54,6 @@
     </div>
 </div>
 
-
-
-
-
-
-
-
 <div id="nav-menu">
     <div class="menu-header">
         <span style="font-weight:bold;">Menu</span>
@@ -63,16 +64,14 @@
         <button onclick="alert('Searching...')">Search</button>
     </div>
     <a href="../index.html">Home</a>
-    <div id="my-orders-link" style="display:none;"><a href="#" onclick="showOrders()">My Orders</a></div>
-    <a href="shop/.">Shop</a>
+    <a href="shop.html">Shop</a>
     <a href="https://wa.me/9779761081110" target="_blank">Contact Us</a>
 </div>
-
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, query, orderByChild, equalTo, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
@@ -94,60 +93,8 @@
     window.googleLogin = () => signInWithPopup(auth, provider);
     window.logoutUser = () => signOut(auth).then(() => location.reload());
 
-    window.showOrders = () => {
-        toggleMenu();
-        const user = auth.currentUser;
-        if (!user) return;
-        
-        const area = document.getElementById("content-area");
-        
-        // पछाडि फर्किने बटन र हेडिङ
-        area.innerHTML = `
-            <button onclick="location.reload()" style="margin-bottom:15px; padding:8px 15px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer;">
-                ← Back
-            </button>
-            <h2>My Orders</h2>
-        `;
-
-        const ordersRef = query(ref(db, 'orders'), orderByChild('userId'), equalTo(user.uid));
-        
-        onValue(ordersRef, (snapshot) => {
-            // अर्डर सूची देखाउनु अघि 'Back' बटन यथावत राख्न
-            let orderHtml = `
-                <button onclick="location.reload()" style="margin-bottom:15px; padding:8px 15px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer;">
-                    ← Back
-                </button>
-                <h2>My Orders</h2>
-            `;
-            
-            let orderArray = [];
-            snapshot.forEach((s) => { orderArray.push(s.val()); });
-            orderArray.reverse(); 
-
-            if (orderArray.length > 0) {
-                orderArray.forEach((o) => {
-                    let statusColor = '#eab308';
-                    if (o.status === 'Complete') statusColor = 'green';
-                    else if (o.status === 'Rejected') statusColor = 'red';
-
-                    orderHtml += `
-                        <div class="order-card">
-                            <p style="font-size: 14px; margin: 3px 0;">Product: <b>${o.product || "N/A"}</b></p>
-                            <p style="font-size: 14px; margin: 3px 0;">Player ID: <b>${o.uid || "N/A"}</b></p>
-                            <p style="font-size: 14px; margin: 3px 0;">Status: <b style="color:${statusColor}">${o.status}</b></p>
-                        </div>`;
-                });
-                area.innerHTML = orderHtml;
-            } else { 
-                area.innerHTML = orderHtml + "<p>No Order History</p>"; 
-            }
-        });
-    };
-
-
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            document.getElementById("my-orders-link").style.display = "block";
             document.getElementById("login-container").style.display = "none";
             document.getElementById("profile-pic").style.display = "block";
             document.getElementById("profile-pic").src = user.photoURL;
@@ -156,10 +103,10 @@
         }
     });
 </script>
-
-
-
 </body>
+</html>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
