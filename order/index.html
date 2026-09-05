@@ -562,7 +562,7 @@
                                 ${orderDateStr ? `<div class="info-row"><i class="fa-solid fa-calendar-days"></i> ${orderDateStr}</div>` : ''}
                                 ${displayEmail ? `<div class="info-row"><i class="fa-solid fa-envelope"></i> ${displayEmail}</div>` : ''}
                                 ${displayUID ? `<div class="info-row"><i class="fa-solid fa-gamepad"></i> UID: <b>${displayUID}</b></div>` : ''}
-                                ${displayPlayerName && displayPlayerName !== "Unknown" ? `<div class="info-row" style="display: flex; align-items: center;"><i class="fa-solid fa-user-check" style="align-self: center;"></i> <span>Player:</span> <span style="font-family: sans-serif; color: #0284c7; font-weight: 700; margin-left: 4px;">${displayPlayerName}</span></div>` : ''}
+                                ${displayPlayerName && displayPlayerName !== "Unknown" ? `<div class="info-row"><i class="fa-solid fa-user-check"></i> Player: <span style="font-family: sans-serif; color: #0284c7; font-weight: 700; margin-left: 2px; display: inline-block; vertical-align: middle;">${displayPlayerName}</span></div>` : ''}
                                 ${displayZoneId ? `<div class="info-row"><i class="fa-solid fa-server"></i> Zone ID: <b>${displayZoneId}</b></div>` : ''}
                                 ${order.redeemCode ? `<div class="info-row" style="color:#2563eb;"><i class="fa-solid fa-key"></i> Code: <b>${order.redeemCode}</b></div>` : ''}
                                 
