@@ -522,14 +522,21 @@
             keys.reverse().forEach(key => {
                 const order = globalOrders[key];
                 
-                const isOwner = (order.email && currentUser.email && order.email.toLowerCase() === currentUser.email.toLowerCase());
+                // इमेल, authEmail र userId तीनवटैबाट म्याच गराउने कोड
+                const orderEmail = (order.email || order.authEmail || '').toLowerCase();
+                const currentEmail = (currentUser.email || '').toLowerCase();
+                const orderUserId = order.userId || '';
+                const currentUserId = currentUser.uid || '';
+
+                const isOwner = (orderEmail && currentEmail && orderEmail === currentEmail) || 
+                                (orderUserId && currentUserId && orderUserId === currentUserId);
                 
                 if (!isAdmin && !isOwner) return;
 
                 const displayUID = (order.uid && order.uid.length < 20) ? order.uid : (order.playerId || order.gameId || order.playerUID || '');
                 const displayPlayerName = order.playerName || '';
                 const displayZoneId = order.zoneid || order.zoneId || order.zone || order.server || order.zoneID || '';
-                const displayEmail = order.email || order.userEmail || '';
+                const displayEmail = order.email || order.userEmail || order.authEmail || '';
                 const productTitle = order.product || order.productName || order.title || 'Game Topup';
                 let orderStatus = (order.status || 'pending').toLowerCase();
                 
@@ -562,7 +569,7 @@
                                 ${orderDateStr ? `<div class="info-row"><i class="fa-solid fa-calendar-days"></i> ${orderDateStr}</div>` : ''}
                                 ${displayEmail ? `<div class="info-row"><i class="fa-solid fa-envelope"></i> ${displayEmail}</div>` : ''}
                                 ${displayUID ? `<div class="info-row"><i class="fa-solid fa-gamepad"></i> UID: <b>${displayUID}</b></div>` : ''}
-                                ${displayPlayerName && displayPlayerName !== "Unknown" ? `<div class="info-row"><i class="fa-solid fa-user-check"></i> Player: <span style="font-family: sans-serif; color: #0284c7; font-weight: 700; margin-left: 2px; display: inline-block; vertical-align: middle;">${displayPlayerName}</span></div>` : ''}
+                                ${displayPlayerName && displayPlayerName !== "Unknown" ? `<div class="info-row"><i class="fa-solid fa-user-check"></i> Player: <b style="color: #0284c7;">${displayPlayerName}</b></div>` : ''}
                                 ${displayZoneId ? `<div class="info-row"><i class="fa-solid fa-server"></i> Zone ID: <b>${displayZoneId}</b></div>` : ''}
                                 ${order.redeemCode ? `<div class="info-row" style="color:#2563eb;"><i class="fa-solid fa-key"></i> Code: <b>${order.redeemCode}</b></div>` : ''}
                                 
