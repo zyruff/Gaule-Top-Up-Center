@@ -308,11 +308,21 @@
         .pack-card:active { transform: scale(0.98); }
         .pack-card.selected { border: 2px solid #ecc94b !important; background-color: #fffcf0; }
         
+        /* --- IMAGE FIX (Medium & Centered) --- */
+        .pack-img-container {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin: 4px 0;
+        }
+
         .pack-img {
-            width: 50px; 
-            height: 50px;
+            width: 65px; 
+            height: 65px;
             object-fit: contain;
-            margin-top: 5px;
+            display: block;
         }
 
         .pack-info {
@@ -495,7 +505,9 @@
 
         <div class="cards-grid" id="packs-wrapper">
             <div class="pack-card" onclick="selectPack(this, '6 Level Package', '100')">
-                <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
+                <div class="pack-img-container">
+                    <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
+                </div>
                 <div class="pack-info">
                     <div class="pack-title">6 Level Package</div>
                     <div class="pack-price">Rs.100</div>
@@ -503,7 +515,9 @@
             </div>
 
             <div class="pack-card" onclick="selectPack(this, '10 Level Package', '100')">
-                <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
+                <div class="pack-img-container">
+                    <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
+                </div>
                 <div class="pack-info">
                     <div class="pack-title">10 Level Package</div>
                     <div class="pack-price">Rs.100</div>
@@ -511,7 +525,9 @@
             </div>
 
             <div class="pack-card" onclick="selectPack(this, '15 Level Package', '100')">
-                <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
+                <div class="pack-img-container">
+                    <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
+                </div>
                 <div class="pack-info">
                     <div class="pack-title">15 Level Package</div>
                     <div class="pack-price">Rs.100</div>
@@ -519,7 +535,9 @@
             </div>
 
             <div class="pack-card" onclick="selectPack(this, '20 Level Package', '100')">
-                <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
+                <div class="pack-img-container">
+                    <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
+                </div>
                 <div class="pack-info">
                     <div class="pack-title">20 Level Package</div>
                     <div class="pack-price">Rs.100</div>
@@ -527,7 +545,9 @@
             </div>
 
             <div class="pack-card" onclick="selectPack(this, '25 Level Package', '100')">
-                <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
+                <div class="pack-img-container">
+                    <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
+                </div>
                 <div class="pack-info">
                     <div class="pack-title">25 Level Package</div>
                     <div class="pack-price">Rs.100</div>
@@ -535,16 +555,19 @@
             </div>
 
             <div class="pack-card" onclick="selectPack(this, '30 Level Package', '130')">
-                <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
+                <div class="pack-img-container">
+                    <img src="leveluppass.png" class="pack-img" alt="Level Up Pass">
+                </div>
                 <div class="pack-info">
                     <div class="pack-title">30 Level Package</div>
                     <div class="pack-price">Rs.130</div>
                 </div>
             </div>
 
-            <!-- अब यो पनि अरू जस्तै Square आकारमा बस्नेछ -->
             <div class="pack-card" onclick="selectPack(this, 'All Package 6-30.Lv', '550')">
-                <img src="leveluppass.png" class="pack-img" alt="All Level Pass">
+                <div class="pack-img-container">
+                    <img src="leveluppass.png" class="pack-img" alt="All Level Pass">
+                </div>
                 <div class="pack-info">
                     <div class="pack-title">All Package 6-30.Lv</div>
                     <div class="pack-price">Rs.550</div>
@@ -865,7 +888,7 @@
                     submitBtn.disabled = false;
                     submitBtn.innerText = "Submit Payment";
                     submitBtn.style.opacity = "1";
-                    submitBtn.style.cursor = "pointer5";
+                    submitBtn.style.cursor = "pointer";
                 }
             });
         };
@@ -877,6 +900,7 @@
     </script>
 </body>
 </html>
+
 
 
 
