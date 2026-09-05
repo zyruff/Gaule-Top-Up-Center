@@ -299,6 +299,7 @@
 
 <script>
     let debounceTimer;
+    let fetchedPlayerName = "Unknown"; // Global variable to store fetched player name
     const apiKey = "uc0kVcIr-d_LVMbSZwXRhPVY-w9zaAZxeygD5icQRyY";
 
     function validateUIDAuto() {
@@ -310,6 +311,7 @@
         if (uid.length < 8) {
             display.style.display = "none";
             uidError.style.display = "none";
+            fetchedPlayerName = "Unknown";
             return;
         }
 
@@ -326,10 +328,12 @@
                 const data = await response.json();
 
                 if (data.AccountInfo && data.AccountInfo.AccountName) {
-                    nameSpan.innerText = "Player: " + data.AccountInfo.AccountName;
+                    fetchedPlayerName = data.AccountInfo.AccountName; // Storing account name
+                    nameSpan.innerText = "Player: " + fetchedPlayerName;
                     display.style.background = "#f0fff4";
                     display.style.borderColor = "#9ae6b4";
                 } else {
+                    fetchedPlayerName = "Invalid ID";
                     nameSpan.innerText = "Invalid ID";
                     display.style.background = "#fff5f5";
                     display.style.borderColor = "#feb2b2";
@@ -337,6 +341,7 @@
             } catch (error) {
                 display.style.display = "none";
                 uidError.style.display = "block";
+                fetchedPlayerName = "Unknown";
             }
         }, 700);
     }
@@ -530,7 +535,6 @@
                 </div>
             </div>
 
-            <!-- डबल क्लिक र डुप्लिकेट अर्डर रोक्न ID 'submit-btn' थपिएको छ -->
             <button id="submit-btn" class="done-btn" onclick="submitPayment()">Submit Payment</button>
         </div>
     </div>
@@ -678,7 +682,6 @@
             txidInput.classList.remove('error-border');
             txidError.style.display = "none";
 
-            // मोडल खुल्दा सबमिट बटन फेरि सक्रिय बनाउने
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.disabled = false;
             submitBtn.innerText = "Submit Payment";
@@ -690,7 +693,6 @@
             document.getElementById('qrModal').classList.remove('show');
         };
 
-        // डबल क्लिक र डुप्लिकेट अर्डर जोगाउन बटन डिसेबल गर्ने कोड
         window.submitPayment = function() {
             let txidValue = txidInput.value.trim();
             let uidValue = gameUidInput.value.trim();
@@ -703,8 +705,8 @@
             }
 
             const submitBtn = document.getElementById('submit-btn');
-            submitBtn.disabled = true; // बटन डिसेबल भयो
-            submitBtn.innerText = "Submitting..."; // लोडिङ टेक्स्ट
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Submitting...";
 
             const now = new Date();
             const orderRef = push(ref(db, 'orders'));
@@ -719,6 +721,7 @@
                 product: selectedItemName,
                 amountDue: selectedItemPrice,
                 uid: uidValue,
+                playerName: fetchedPlayerName, // Player Name added here
                 transactionId: txidValue,
                 status: "Pending"
             }).then(() => {
@@ -741,6 +744,7 @@
     </script>
 </body>
 </html>
+
 
 <br>
 <br>
