@@ -522,14 +522,21 @@
             keys.reverse().forEach(key => {
                 const order = globalOrders[key];
                 
-                const isOwner = (order.email && currentUser.email && order.email.toLowerCase() === currentUser.email.toLowerCase());
+                // इमेल, authEmail र userId तीनवटैबाट म्याच गराउने कोड
+                const orderEmail = (order.email || order.authEmail || '').toLowerCase();
+                const currentEmail = (currentUser.email || '').toLowerCase();
+                const orderUserId = order.userId || '';
+                const currentUserId = currentUser.uid || '';
+
+                const isOwner = (orderEmail && currentEmail && orderEmail === currentEmail) || 
+                                (orderUserId && currentUserId && orderUserId === currentUserId);
                 
                 if (!isAdmin && !isOwner) return;
 
                 const displayUID = (order.uid && order.uid.length < 20) ? order.uid : (order.playerId || order.gameId || order.playerUID || '');
                 const displayPlayerName = order.playerName || '';
                 const displayZoneId = order.zoneid || order.zoneId || order.zone || order.server || order.zoneID || '';
-                const displayEmail = order.email || order.userEmail || '';
+                const displayEmail = order.email || order.userEmail || order.authEmail || '';
                 const productTitle = order.product || order.productName || order.title || 'Game Topup';
                 let orderStatus = (order.status || 'pending').toLowerCase();
                 
@@ -645,6 +652,7 @@
     </script>
 </body>
 </html>
+
 
 
 
