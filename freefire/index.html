@@ -653,7 +653,7 @@
             
             const modalPlayerRow = document.getElementById('modal-player-row');
             // यदि नाम फेला परेको छैन भने Not Checked वा UID मात्र राख्ने
-            const finalPlayerName = (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName) ? fetchedPlayerName : "Not Checked / Manual";
+            const finalPlayerName = (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName) ? fetchedPlayerName : "Unknown";
             
             document.getElementById('modal-player-name').innerText = finalPlayerName;
             modalPlayerRow.style.display = "flex";
