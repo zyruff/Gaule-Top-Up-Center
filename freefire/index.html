@@ -109,6 +109,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -264,6 +265,7 @@
         if (!uid) {
             gameUidInput.classList.add('error-border');
             uidError.style.display = "flex";
+            uidError.querySelector("span").innerText = "Invalid or Missing UID!";
             display.style.display = "none";
             fetchedPlayerName = "";
             return;
@@ -298,18 +300,18 @@
                 gameUidInput.classList.remove('error-border');
                 uidError.style.display = "none";
             } else {
-                // UID फेच भएन भने पनि प्रयोगकर्तालाई रोक्दैन, खाली नाम वा "Manual Check" राख्छ
-                fetchedPlayerName = "Manual Check";
+                fetchedPlayerName = "";
                 display.style.display = "none";
-                gameUidInput.classList.remove('error-border');
-                uidError.style.display = "none";
+                gameUidInput.classList.add('error-border');
+                uidError.style.display = "flex";
+                uidError.querySelector("span").innerText = "Invalid or Missing UID!";
             }
         } catch (error) {
-            // नेटवर्क वा एपीआईमा एरर आए पनि अर्डर गर्न मिल्ने बनाइएको छ
-            fetchedPlayerName = "Manual Check";
+            fetchedPlayerName = "";
             display.style.display = "none";
-            gameUidInput.classList.remove('error-border');
-            uidError.style.display = "none";
+            gameUidInput.classList.add('error-border');
+            uidError.style.display = "flex";
+            uidError.querySelector("span").innerText = "Invalid or Missing UID!";
         }
     }
 </script>
@@ -605,10 +607,11 @@
             }
 
             let uidValue = gameUidInput.value.trim();
-            // UID मात्र खाली हुनु भएन, एपीआईले नाम फेच गर्न नसके पनि UID टाइप गरेको भरमा अर्डर गर्न मिल्ने बनाइएको छ
-            if (uidValue === "") {
+            // UID खाली छ वा API बाट नाम फेच भएको छैन भने अर्डर रोक्ने र Invalid or Missing UID देखाउने
+            if (uidValue === "" || !fetchedPlayerName) {
                 gameUidInput.classList.add('error-border');
                 uidError.style.display = "flex";
+                uidError.querySelector("span").innerText = "Invalid or Missing UID!";
                 if(isFormValid) gameUidInput.focus();
                 isFormValid = false;
             }
@@ -653,7 +656,7 @@
             document.getElementById('modal-uid').innerText = uid;
             
             const modalPlayerRow = document.getElementById('modal-player-row');
-            const finalPlayerName = (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName) ? fetchedPlayerName : "Manual Check";
+            const finalPlayerName = (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName) ? fetchedPlayerName : "Unknown";
             
             document.getElementById('modal-player-name').innerText = finalPlayerName;
             modalPlayerRow.style.display = "flex";
@@ -693,7 +696,7 @@
 
             const now = new Date();
             const orderRef = push(ref(db, 'orders'));
-            const finalPlayerName = (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName) ? fetchedPlayerName : "Manual Check";
+            const finalPlayerName = (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName) ? fetchedPlayerName : "Unknown";
             
             set(orderRef, {
                 date: now.toLocaleDateString(),
@@ -716,7 +719,7 @@
                 document.getElementById('successModal').classList.add('show');
             }).catch((error) => {
                 alert("अर्डर पठाउन समस्या भयो: " + error.message);
-                submitBtn.disabled, submitBtn.disabled = false;
+                submitBtn.disabled = false;
                 submitBtn.innerText = "Submit Payment";
             });
         };
