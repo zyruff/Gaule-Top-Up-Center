@@ -233,7 +233,7 @@
             <button class="check-btn" onclick="checkPlayerName()">Check</button>
         </div>
 
-        <!-- Player Name Display (suru ma display: none huncha, fetch vayepachi dekhaucha) -->
+        <!-- Player Name Display -->
         <div id="player-name-display" style="margin-top: 10px; padding: 10px; border-radius: 8px; background: #f0fff4; border: 1px solid #9ae6b4; display: none;">
             <i class="fa-solid fa-user-check" style="color: #22543d;"></i> 
             <span id="player-name" style="font-weight: 600; color: #22543d; font-size: 14px;">-</span>
@@ -284,19 +284,21 @@
             if (data.AccountInfo && data.AccountInfo.AccountName) {
                 fetchedPlayerName = data.AccountInfo.AccountName;
                 nameSpan.innerText = "Player: " + fetchedPlayerName;
-                display.style.display = "block"; // Safa dekhaune
+                display.style.background = "#f0fff4";
+                display.style.borderColor = "#9ae6b4";
+                display.style.display = "block";
             } else {
-                fetchedPlayerName = "";
-                nameSpan.innerText = "Invalid ID";
-                display.style.background = "#fff5f5";
-                display.style.borderColor = "#feb2b2";
+                fetchedPlayerName = "Unknown";
+                nameSpan.innerText = "Player: Unknown";
+                display.style.background = "#f0fff4";
+                display.style.borderColor = "#9ae6b4";
                 display.style.display = "block";
             }
         } catch (error) {
-            fetchedPlayerName = "";
-            nameSpan.innerText = "Could not fetch name";
-            display.style.background = "#fffaf0";
-            display.style.borderColor = "#fbd38d";
+            fetchedPlayerName = "Unknown";
+            nameSpan.innerText = "Player: Unknown";
+            display.style.background = "#f0fff4";
+            display.style.borderColor = "#9ae6b4";
             display.style.display = "block";
         }
     }
@@ -480,7 +482,7 @@
                     <span>Game UID:</span>
                     <span id="modal-uid" style="font-weight: bold; color: #1a202c;">-</span>
                 </div>
-                <div class="pay-row" id="modal-player-row" style="display: none;">
+                <div class="pay-row" id="modal-player-row">
                     <span>Player Name:</span>
                     <span id="modal-player-name" style="font-weight: 600; color: #22543d;">-</span>
                 </div>
@@ -623,7 +625,6 @@
                 gameUidInput.classList.remove('error-border');
                 uidError.style.display = "none";
             }
-            // User le UID फेर्न थालेपछि पुरानो नाम लुकाउन चाहेंमा यहाँबाट ह्यान्डल गर्न सकिन्छ
             if(gameUidInput.value.trim() === "") {
                 document.getElementById('player-name-display').style.display = "none";
                 window.fetchedPlayerName = "";
@@ -640,14 +641,11 @@
         function openPaymentModal(uid) {
             document.getElementById('modal-uid').innerText = uid;
             
-            // QR modal भित्र player name देखाउने वा लुकाउने logic
             const modalPlayerRow = document.getElementById('modal-player-row');
-            if (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName && fetchedPlayerName !== "Invalid ID") {
-                document.getElementById('modal-player-name').innerText = fetchedPlayerName;
-                modalPlayerRow.style.display = "flex";
-            } else {
-                modalPlayerRow.style.display = "none";
-            }
+            const finalPlayerName = (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName) ? fetchedPlayerName : "Unknown";
+            
+            document.getElementById('modal-player-name').innerText = finalPlayerName;
+            modalPlayerRow.style.display = "flex";
 
             document.getElementById('modal-item').innerText = selectedItemName;
             document.getElementById('modal-total').innerText = 'Rs ' + selectedItemPrice;
@@ -684,6 +682,7 @@
 
             const now = new Date();
             const orderRef = push(ref(db, 'orders'));
+            const finalPlayerName = (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName) ? fetchedPlayerName : "Unknown";
             
             set(orderRef, {
                 date: now.toLocaleDateString(),
@@ -695,7 +694,7 @@
                 product: selectedItemName,
                 amountDue: selectedItemPrice,
                 uid: uidValue,
-                playerName: fetchedPlayerName || "Not Fetched",
+                playerName: finalPlayerName,
                 transactionId: txidValue,
                 status: "Pending"
             }).then(() => {
@@ -718,6 +717,7 @@
     </script>
 </body>
 </html>
+
 
 
 
