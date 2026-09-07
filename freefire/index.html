@@ -110,6 +110,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -152,6 +153,10 @@
         .pack-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1a202c; }
         .pack-price { font-size: 15px; font-weight: 700; color: #ffb300; }
         .diamond-icon { position: absolute; bottom: 14px; right: 14px; color: #3182ce; font-size: 20px; }
+        .admin-api-panel { background: #fffdf5; border: 1px dashed #ffb300; border-radius: 12px; padding: 14px; margin: 0 16px 20px 16px; display: none; }
+        .admin-api-panel.show { display: block; }
+        .admin-api-panel input { width: 100%; padding: 8px 10px; margin-bottom: 8px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 12px; outline: none; }
+        .admin-save-btn { background: #ffb300; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; }
         .bottom-drawer { position: fixed; bottom: 55px; left: 2px; right: 2px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); z-index: 100; }
         .drawer-inner { max-width: 600px; margin: 0 auto; }
         .row-detail { display: flex; justify-content: space-between; font-size: 13px; color: #4a5568; margin-bottom: 8px; }
@@ -222,6 +227,16 @@
         <div class="tab">Membership</div>
     </div>
 
+    <!-- Admin API Control Panel -->
+    <div class="admin-api-panel" id="adminApiPanel">
+        <div style="font-weight: 700; font-size: 13px; color: #b7791f; margin-bottom: 6px;"><i class="fa-solid fa-gear"></i> Admin API Settings</div>
+        <label style="font-size: 11px; color: #4a5568; font-weight: 600;">API URL endpoint:</label>
+        <input type="text" id="admin-api-url" placeholder="https://api.gameskinbo.com/ff-info/get">
+        <label style="font-size: 11px; color: #4a5568; font-weight: 600;">API Key (x-api-key):</label>
+        <input type="text" id="admin-api-key" placeholder="Enter API Key">
+        <button class="admin-save-btn" onclick="saveApiSettings()">Save API Settings</button>
+    </div>
+
 <div class="section-box">
     <div class="section-header-flex">
         <div class="box-title">Game ID <span style="color: #e53e3e;">*</span></div>
@@ -250,71 +265,6 @@
         </div>
     </div>
 </div>
-
-<script>
-    let fetchedPlayerName = ""; 
-    const apiKey = "8-kVJLu1Bxy5Mj6tmJupzSwK3WSJJ22wj29FGVvwwm4";
-
-    async function checkPlayerName() {
-        const uid = document.getElementById("game-uid").value.trim();
-        const display = document.getElementById("player-name-display");
-        const nameSpan = document.getElementById("player-name");
-        const uidError = document.getElementById("uid-error");
-        const gameUidInput = document.getElementById("game-uid");
-
-        if (!uid) {
-            gameUidInput.classList.add('error-border');
-            uidError.style.display = "flex";
-            uidError.querySelector("span").innerText = "Please enter your Game UID!";
-            display.style.display = "none";
-            fetchedPlayerName = "";
-            return;
-        }
-
-        display.style.display = "block";
-        nameSpan.innerText = "Searching...";
-        display.style.background = "#f0fff4";
-        display.style.borderColor = "#9ae6b4";
-        uidError.style.display = "none";
-        gameUidInput.classList.remove('error-border');
-
-        try {
-            const response = attetchAPIRes = await fetch(`https://api.gameskinbo.com/ff-info/get?uid=${uid}&region=BD`, {
-                headers: { 'x-api-key': apiKey }
-            });
-            const data = await response.json();
-
-            let accountName = "";
-            if (data.AccountInfo) {
-                accountName = data.AccountInfo.AccountName || data.AccountInfo.Nickname || data.AccountInfo.AccountNickName || data.AccountInfo.UserName;
-            } else if (data.nickname || data.name || data.AccountName) {
-                accountName = data.nickname || data.name || data.AccountName;
-            }
-
-            if (accountName) {
-                fetchedPlayerName = accountName;
-                nameSpan.innerText = "Player: " + fetchedPlayerName;
-                display.style.background = "#f0fff4";
-                display.style.borderColor = "#9ae6b4";
-                display.style.display = "block";
-                gameUidInput.classList.remove('error-border');
-                uidError.style.display = "none";
-            } else {
-                fetchedPlayerName = "";
-                display.style.display = "none";
-                gameUidInput.classList.add('error-border');
-                uidError.style.display = "flex";
-                uidError.querySelector("span").innerText = "Invalid or Missing UID!";
-            }
-        } catch (error) {
-            fetchedPlayerName = "";
-            display.style.display = "none";
-            gameUidInput.classList.add('error-border');
-            uidError.style.display = "flex";
-            uidError.querySelector("span").innerText = "Invalid or Missing UID!";
-        }
-    }
-</script>
 
     <div class="section-box">
         <div class="section-header-flex">
@@ -546,7 +496,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+        import { getDatabase, ref, push, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
@@ -566,6 +516,11 @@
         let currentUser = null;
         let selectedItemName = "";
         let selectedItemPrice = "";
+        let fetchedPlayerName = ""; 
+
+        // Default Fallbacks
+        let currentApiUrl = "https://api.gameskinbo.com/ff-info/get";
+        let currentApiKey = "8-kVJLu1Bxy5Mj6tmJupzSwK3WSJJ22wj29FGVvwwm4";
 
         const mainActionBtn = document.getElementById('main-action-btn');
         const gameUidInput = document.getElementById('game-uid');
@@ -574,18 +529,124 @@
         const diamondsWrapper = document.getElementById('diamonds-wrapper');
         const txidInput = document.getElementById('txid');
         const txidError = document.getElementById('txid-error');
+        const adminApiPanel = document.getElementById('adminApiPanel');
+
+        // Load API settings from Firebase on startup
+        async function loadApiSettings() {
+            try {
+                const snapshot = await get(child(ref(db), 'settings/api'));
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    if (data.url) currentApiUrl = data.url;
+                    if (data.key) currentApiKey = data.key;
+                }
+            } catch (e) {
+                console.log("Using default API configurations");
+            }
+        }
+        loadApiSettings();
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
                 mainActionBtn.innerHTML = `<i class="fa-solid fa-basket-shopping"></i> Buy Now`;
                 mainActionBtn.classList.remove('login-needed');
+
+                // एडमिन इमेल चेक गरि एडमिन प्यानल देखाउने
+                if (user.email === "gaulestore.p@gmail.com") {
+                    adminApiPanel.classList.add('show');
+                    document.getElementById('admin-api-url').value = currentApiUrl;
+                    document.getElementById('admin-api-key').value = currentApiKey;
+                } else {
+                    adminApiPanel.classList.remove('show');
+                }
             } else {
                 currentUser = null;
                 mainActionBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Login to Buy`;
                 mainActionBtn.classList.add('login-needed');
+                adminApiPanel.classList.remove('show');
             }
         });
+
+        window.saveApiSettings = function() {
+            const newUrl = document.getElementById('admin-api-url').value.trim();
+            const newKey = document.getElementById('admin-api-key').value.trim();
+
+            if (!newUrl || !newKey) {
+                alert("कृपया API URL र Key दुवै भर्नुहोस्!");
+                return;
+            }
+
+            set(ref(db, 'settings/api'), {
+                url: newUrl,
+                key: newKey
+            }).then(() => {
+                currentApiUrl = newUrl;
+                currentApiKey = newKey;
+                alert("API Settings Successfully Updated!");
+            }).catch((err) => {
+                alert("Failed to update: " + err.message);
+            });
+        };
+
+        window.checkPlayerName = async function() {
+            const uid = document.getElementById("game-uid").value.trim();
+            const display = document.getElementById("player-name-display");
+            const nameSpan = document.getElementById("player-name");
+            const uidError = document.getElementById("uid-error");
+
+            if (!uid) {
+                gameUidInput.classList.add('error-border');
+                uidError.style.display = "flex";
+                uidError.querySelector("span").innerText = "Please enter your Game UID!";
+                display.style.display = "none";
+                fetchedPlayerName = "";
+                return;
+            }
+
+            display.style.display = "block";
+            nameSpan.innerText = "Searching...";
+            display.style.background = "#f0fff4";
+            display.style.borderColor = "#9ae6b4";
+            uidError.style.display = "none";
+            gameUidInput.classList.remove('error-border');
+
+            try {
+                const response = await fetch(`${currentApiUrl}?uid=${uid}&region=BD`, {
+                    headers: { 'x-api-key': currentApiKey }
+                });
+                const data = await response.json();
+
+                let accountName = "";
+                if (data.AccountInfo) {
+                    accountName = data.AccountInfo.AccountName || data.AccountInfo.Nickname || data.AccountInfo.AccountNickName || data.AccountInfo.UserName;
+                } else if (data.nickname || data.name || data.AccountName) {
+                    accountName = data.nickname || data.name || data.AccountName;
+                }
+
+                if (accountName) {
+                    fetchedPlayerName = accountName;
+                    nameSpan.innerText = "Player: " + fetchedPlayerName;
+                    display.style.background = "#f0fff4";
+                    display.style.borderColor = "#9ae6b4";
+                    display.style.display = "block";
+                    gameUidInput.classList.remove('error-border');
+                    uidError.style.display = "none";
+                } else {
+                    fetchedPlayerName = "";
+                    display.style.display = "none";
+                    gameUidInput.classList.add('error-border');
+                    uidError.style.display = "flex";
+                    uidError.querySelector("span").innerText = "Invalid or Missing UID!";
+                }
+            } catch (error) {
+                fetchedPlayerName = "";
+                display.style.display = "none";
+                gameUidInput.classList.add('error-border');
+                uidError.style.display = "flex";
+                uidError.querySelector("span").innerText = "Invalid or Missing UID!";
+            }
+        };
 
         mainActionBtn.onclick = function() {
             if (!currentUser) {
@@ -607,7 +668,6 @@
             }
 
             let uidValue = gameUidInput.value.trim();
-            // UID मात्र खाली छ भने रोक्ने (गलत भए पनि, नाम नआए पनि अर्डर गर्न मिल्ने)
             if (uidValue === "") {
                 gameUidInput.classList.add('error-border');
                 uidError.style.display = "flex";
@@ -650,9 +710,7 @@
 
         function openPaymentModal(uid) {
             document.getElementById('modal-uid').innerText = uid;
-            
             const modalPlayerRow = document.getElementById('modal-player-row');
-            // यदि नाम फेला परेको छैन भने Not Checked वा UID मात्र राख्ने
             const finalPlayerName = (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName) ? fetchedPlayerName : "Unknown";
             
             document.getElementById('modal-player-name').innerText = finalPlayerName;
