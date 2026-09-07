@@ -252,7 +252,7 @@
 
 <script>
     let fetchedPlayerName = ""; 
-    const apiKey = "ondkHETdF0ytniap9k3udmJSYGd1fz0sCq0-4o_p-Zo";
+    const apiKey = "8-kVJLu1Bxy5Mj6tmJupzSwK3WSJJ22wj29FGVvwwm4";
 
     async function checkPlayerName() {
         const uid = document.getElementById("game-uid").value.trim();
@@ -298,16 +298,18 @@
                 gameUidInput.classList.remove('error-border');
                 uidError.style.display = "none";
             } else {
-                fetchedPlayerName = "";
+                // UID फेच भएन भने पनि प्रयोगकर्तालाई रोक्दैन, खाली नाम वा "Manual Check" राख्छ
+                fetchedPlayerName = "Manual Check";
                 display.style.display = "none";
-                gameUidInput.classList.add('error-border');
-                uidError.style.display = "flex";
+                gameUidInput.classList.remove('error-border');
+                uidError.style.display = "none";
             }
         } catch (error) {
-            fetchedPlayerName = "";
+            // नेटवर्क वा एपीआईमा एरर आए पनि अर्डर गर्न मिल्ने बनाइएको छ
+            fetchedPlayerName = "Manual Check";
             display.style.display = "none";
-            gameUidInput.classList.add('error-border');
-            uidError.style.display = "flex";
+            gameUidInput.classList.remove('error-border');
+            uidError.style.display = "none";
         }
     }
 </script>
@@ -603,7 +605,8 @@
             }
 
             let uidValue = gameUidInput.value.trim();
-            if (uidValue === "" || !fetchedPlayerName) {
+            // UID मात्र खाली हुनु भएन, एपीआईले नाम फेच गर्न नसके पनि UID टाइप गरेको भरमा अर्डर गर्न मिल्ने बनाइएको छ
+            if (uidValue === "") {
                 gameUidInput.classList.add('error-border');
                 uidError.style.display = "flex";
                 if(isFormValid) gameUidInput.focus();
@@ -650,7 +653,7 @@
             document.getElementById('modal-uid').innerText = uid;
             
             const modalPlayerRow = document.getElementById('modal-player-row');
-            const finalPlayerName = (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName) ? fetchedPlayerName : "Unknown";
+            const finalPlayerName = (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName) ? fetchedPlayerName : "Manual Check";
             
             document.getElementById('modal-player-name').innerText = finalPlayerName;
             modalPlayerRow.style.display = "flex";
@@ -690,7 +693,7 @@
 
             const now = new Date();
             const orderRef = push(ref(db, 'orders'));
-            const finalPlayerName = (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName) ? fetchedPlayerName : "Unknown";
+            const finalPlayerName = (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName) ? fetchedPlayerName : "Manual Check";
             
             set(orderRef, {
                 date: now.toLocaleDateString(),
@@ -713,7 +716,7 @@
                 document.getElementById('successModal').classList.add('show');
             }).catch((error) => {
                 alert("अर्डर पठाउन समस्या भयो: " + error.message);
-                submitBtn.disabled = false;
+                submitBtn.disabled, submitBtn.disabled = false;
                 submitBtn.innerText = "Submit Payment";
             });
         };
@@ -725,6 +728,7 @@
     </script>
 </body>
 </html>
+
 
 
 
