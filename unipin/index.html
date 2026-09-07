@@ -371,7 +371,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, push, set, query, orderByChild, equalTo, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, push, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBn0kORKJHN_X4uVidhjulK-dAnRujOO3A",
@@ -419,7 +419,6 @@
             }
         });
 
-        // यदि हाल सेलेक्ट गरिएको आइटम आउट अफ स्टक भयो भने चयन हटाउने
         if (selectedItemName) {
             const selectedCard = document.querySelector('.pack-card.selected');
             if (selectedCard && selectedCard.classList.contains('out-of-stock')) {
@@ -489,7 +488,6 @@
     };
 
     window.selectPack = function(element, name, price) {
-        // यदि आउट अफ स्टक छ भने चयन गर्न नदिने
         if (element.classList.contains('out-of-stock')) {
             return;
         }
@@ -564,37 +562,73 @@
             submitBtn.style.cursor = "not-allowed";
         }
 
+        const selectedCard = document.querySelector('.pack-card.selected');
+        const stockKey = selectedCard ? selectedCard.getAttribute('data-stock-key') : null;
+
         const now = new Date();
         const orderRef = push(ref(db, 'orders'));
         
-        set(orderRef, {
-            date: now.toLocaleDateString(),
-            time: now.toLocaleTimeString(),
-            timestamp: Date.now(),
-            authEmail: currentUser.email,
-            name: currentUser.displayName || "User",
-            userId: currentUser.uid,
-            product: selectedItemName,
-            amountDue: selectedItemPrice,
-            email: emailValue,
-            transactionId: txidValue,
-            status: "Pending"
-        }).then(() => {
-            closePaymentModal();
-            document.getElementById('receipt-uid').innerText = emailValue;
-            document.getElementById('receipt-item').innerText = selectedItemName;
-            document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
-            document.getElementById('successModal').classList.add('show');
-        }).catch((error) => {
-            alert("अर्डर पठाउन समस्या भयो: " + error.message);
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Submit Payment";
-                submitBtn.style.opacity = "1";
-                submitBtn.style.cursor = "pointer";
-            }
-        });
+        let dbOperations = [
+            set(orderRef, {
+                date: now.toLocaleDateString(),
+                time: now.toLocaleTimeString(),
+                timestamp: Date.now(),
+                authEmail: currentUser.email,
+                name: currentUser.displayName || "User",
+                userId: currentUser.uid,
+                product: selectedItemName,
+                amountDue: selectedItemPrice,
+                email: emailValue,
+                transactionId: txidValue,
+                status: "Pending"
+            })
+        ];
+
+        if (stockKey) {
+            const stockRef = ref(db, 'stocks/' + stockKey);
+            get(stockRef).then((snapshot) => {
+                let currentStock = snapshot.exists() ? Number(snapshot.val()) : 0;
+                
+                if (currentStock > 0) {
+                    dbOperations.push(set(stockRef, currentStock - 1));
+                }
+
+                Promise.all(dbOperations).then(() => {
+                    closePaymentModal();
+                    document.getElementById('receipt-uid').innerText = emailValue;
+                    document.getElementById('receipt-item').innerText = selectedItemName;
+                    document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
+                    document.getElementById('successModal').classList.add('show');
+                }).catch((error) => {
+                    alert("अर्डर पठाउन समस्या भयो: " + error.message);
+                    resetSubmitBtn(submitBtn);
+                });
+            }).catch((error) => {
+                alert("स्टक चेक गर्न समस्या भयो: " + error.message);
+                resetSubmitBtn(submitBtn);
+            });
+        } else {
+            Promise.all(dbOperations).then(() => {
+                closePaymentModal();
+                document.getElementById('receipt-uid').innerText = emailValue;
+                document.getElementById('receipt-item').innerText = selectedItemName;
+                document.getElementById('receipt-price').innerText = 'Rs ' + selectedItemPrice;
+                document.getElementById('successModal').classList.add('show');
+            }).catch((error) => {
+                alert("अर्डर पठाउन समस्या भयो: " + error.message);
+                resetSubmitBtn(submitBtn);
+            });
+        }
     };
+
+    function resetSubmitBtn(btn) {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerText = "Submit Payment";
+            btn.style.opacity = "1";
+            btn.style.cursor = "pointer";
+        }
+    }
 
     window.closeSuccessModal = function() {
         document.getElementById('successModal').classList.remove('show');
@@ -604,6 +638,7 @@
 
 </body>
 </html>
+
 
 
 
