@@ -5,8 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <head>
-    <!-- अरू हेड ट्यागहरू यहाँ छन् -->
-
     <!-- Open Graph Tags (Facebook, WhatsApp Preview को लागि) -->
     <meta property="og:title" content="Gaule Store - Buy Unipin Voucher in Nepal" />
     <meta property="og:description" content="Buy Unipin Voucher in Nepal at the cheapest price with Gaule Store. 1-5 min instant delivery." />
@@ -14,7 +12,6 @@
     <meta property="og:url" content="https://roshantamang2.com.np/unipin/" />
     <meta property="og:type" content="website" />
 
-    <!-- Twitter Preview को लागि (वैकल्पिक) -->
     <meta name="twitter:card" content="summary_large_image" />
 </head>
 
@@ -44,13 +41,6 @@
         .store-title { font-size: 1.5rem; font-weight: bold; }
         .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; }
 
-        .elegant-back-btn {
-            display: inline-block; padding: 8px 16px; background-color: #e74c3c; color: white;
-            text-decoration: none; border-radius: 5px; font-family: sans-serif; font-size: 14px;
-            font-weight: bold; box-shadow: 0 3px 6px rgba(0,0,0,0.2); transition: background 0.3s, transform 0.2s; margin: 15px;
-        }
-        .elegant-back-btn:hover { background-color: #c0392b; transform: translateY(-2px); }
-
         .banner-container { padding: 16px; background: linear-gradient(180deg, #ffffff 0%, #f7fafc 100%); border-bottom: 1px solid #e2e8f0; }
         .badges-wrapper { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
         .badge { font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
@@ -78,14 +68,14 @@
         .cards-grid.error-border { border: 2px solid #e53e3e !important; background-color: #fff5f5; padding: 8px; border-radius: 10px; }
         .pack-card { display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1px solid #ddd; border-radius: 10px; background: #fff; cursor: pointer; position: relative; }
         .pack-card.selected { border: 2px solid #ffb300 !important; background-color: #fffdf5; }
+        .pack-card.out-of-stock { background-color: #f1f5f9; opacity: 0.6; cursor: not-allowed; border-color: #cbd5e0; }
         .text-content { display: flex; flex-direction: column; }
         .pack-title { font-size: 12px; font-weight: bold; white-space: nowrap; color: #1a202c; }
         .pack-price { font-size: 14px; color: orange; font-weight: bold; margin: 4px 0; }
         .status { font-size: 11px; font-weight: 600; }
         .in-stock { color: #2e7d32; }
-        .out-stock { color: #d32f2f; }
+        .out-stock-text { color: #e53e3e; }
         .unipin-icon { width: 35px; height: 35px; object-fit: contain; }
-        .pack-card.out { opacity: 0.6; background: #eee; cursor: not-allowed; }
 
         .bottom-drawer { position: fixed; bottom: 55px; left: 2px; right: 2px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); z-index: 100; }
         .drawer-inner { max-width: 600px; margin: 0 auto; }
@@ -150,7 +140,6 @@
     </div>
 </div>
 
-
 <div id="nav-menu">
     <div class="menu-header">
         <span style="font-weight:bold;">Menu</span>
@@ -165,7 +154,6 @@
     <a href="shop.html">Shop</a>
     <a href="https://wa.me/9779761081110" target="_blank">Contact Us</a>
 </div>
-
 
 <div class="banner-container">
     <div class="badges-wrapper">
@@ -210,84 +198,85 @@
         <i class="fa-solid fa-circle-exclamation"></i> <span>Please select a pack to proceed!</span>
     </div>
 
+    <!-- प्रत्येक कार्डमा data-stock-key थपिएको छ जुन Firebase को stock key सँग म्याच हुन्छ -->
     <div class="cards-grid" id="diamonds-wrapper">
-        <div class="pack-card out">
+        <div class="pack-card" data-stock-key="25_unipin" onclick="selectPack(this, '25 Unipin Code', '35')">
             <div class="text-content">
                 <div class="pack-title">25 💎 Unipin Code</div>
                 <div class="pack-price">Rs 35</div>
-                <div class="status out-stock">• Out of stock</div>
+                <div class="status stock-status">• Checking...</div>
             </div>
             <img src="unipin.png" alt="UniPin" class="unipin-icon">
         </div>
-        <div class="pack-card out">
+        <div class="pack-card" data-stock-key="50_unipin" onclick="selectPack(this, '50 Unipin Code', '60')">
             <div class="text-content">
                 <div class="pack-title">50 💎 Unipin Code</div>
                 <div class="pack-price">Rs 60</div>
-                <div class="status out-stock">• Out of stock</div>
+                <div class="status stock-status">• Checking...</div>
             </div>
             <img src="unipin.png" alt="UniPin" class="unipin-icon">
         </div>
-        <div class="pack-card" onclick="selectPack(this, '115 Unipin Code', '105')">
+        <div class="pack-card" data-stock-key="115_unipin" onclick="selectPack(this, '115 Unipin Code', '105')">
             <div class="text-content">
                 <div class="pack-title">115 💎 Unipin Code</div>
                 <div class="pack-price">Rs 105</div>
-                <div class="status in-stock">• In Stock: 5</div>
+                <div class="status stock-status">• Checking...</div>
             </div>
             <img src="unipin.png" alt="UniPin" class="unipin-icon">
         </div>
-        <div class="pack-card out">
+        <div class="pack-card" data-stock-key="240_unipin" onclick="selectPack(this, '240 Unipin Code', '210')">
             <div class="text-content">
                 <div class="pack-title">240 💎 Unipin Code</div>
                 <div class="pack-price">Rs 210</div>
-                <div class="status out-stock">• Out of stock</div>
+                <div class="status stock-status">• Checking...</div>
             </div>
             <img src="unipin.png" alt="UniPin" class="unipin-icon">
         </div>
-        <div class="pack-card out">
+        <div class="pack-card" data-stock-key="610_unipin" onclick="selectPack(this, '610 Unipin Code', '530')">
             <div class="text-content">
                 <div class="pack-title">610 💎 Unipin Code</div>
                 <div class="pack-price">Rs 530</div>
-                <div class="status out-stock">• Out of stock</div>
+                <div class="status stock-status">• Checking...</div>
             </div>
             <img src="unipin.png" alt="UniPin" class="unipin-icon">
         </div>
-        <div class="pack-card out">
+        <div class="pack-card" data-stock-key="1240_unipin" onclick="selectPack(this, '1240 Unipin Code', '1050')">
             <div class="text-content">
                 <div class="pack-title">1240 💎 Unipin Code</div>
                 <div class="pack-price">Rs 1050</div>
-                <div class="status out-stock">• Out of stock</div>
+                <div class="status stock-status">• Checking...</div>
             </div>
             <img src="unipin.png" alt="UniPin" class="unipin-icon">
         </div>
-        <div class="pack-card out">
+        <div class="pack-card" data-stock-key="2530_unipin" onclick="selectPack(this, '2530 Unipin Code', '2300')">
             <div class="text-content">
                 <div class="pack-title">2530 💎 Unipin Code</div>
                 <div class="pack-price">Rs 2300</div>
-                <div class="status out-stock">• Out of stock</div>
+                <div class="status stock-status">• Checking...</div>
             </div>
             <img src="unipin.png" alt="UniPin" class="unipin-icon">
         </div>
-        <div class="pack-card out">
+        <div class="pack-card" data-stock-key="weekly_unipin" onclick="selectPack(this, 'Weekly Unipin Code', '220')">
             <div class="text-content">
                 <div class="pack-title">Weekly Unipin Code</div>
                 <div class="pack-price">Rs 220</div>
-                <div class="status out-stock">• Out of stock</div>
+                <div class="status stock-status">• Checking...</div>
             </div>
             <img src="unipin.png" alt="UniPin" class="unipin-icon">
         </div>
-        <div class="pack-card out">
+        <div class="pack-card" data-stock-key="monthly_unipin" onclick="selectPack(this, 'Monthly Unipin Code', '1050')">
             <div class="text-content">
                 <div class="pack-title">Monthly Unipin Code</div>
                 <div class="pack-price">Rs 1050</div>
-                <div class="status out-stock">• Out of stock</div>
+                <div class="status stock-status">• Checking...</div>
             </div>
             <img src="unipin.png" alt="UniPin" class="unipin-icon">
         </div>
-        <div class="pack-card" onclick="selectPack(this, '2000 Unipin Code', '2370')">
+        <div class="pack-card" data-stock-key="2000_unipin" onclick="selectPack(this, '2000 Unipin Code', '2370')">
             <div class="text-content">
                 <div class="pack-title">2000 Unipin Code<br>Load Wallet</div>
                 <div class="pack-price">Rs 2370</div>
-                <div class="status in-stock">• In Stock: 2</div>
+                <div class="status stock-status">• Checking...</div>
             </div>
             <img src="unipin.png" alt="UniPin" class="unipin-icon">
         </div>
@@ -408,52 +397,40 @@
     window.googleLogin = () => signInWithPopup(auth, provider);
     window.logoutUser = () => signOut(auth).then(() => location.reload());
 
-    window.showOrders = () => {
-        toggleMenu();
-        const user = auth.currentUser;
-        if (!user) return;
+    // Firebase बाट stocks डेटा रिड गरेर UI अपडेट गर्ने
+    const stocksRef = ref(db, 'stocks');
+    onValue(stocksRef, (snapshot) => {
+        const stocksData = snapshot.val() || {};
         
-        const area = document.getElementById("content-area");
-        area.innerHTML = `
-            <button onclick="location.reload()" style="margin-bottom:15px; padding:8px 15px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer;">
-                ← Back
-            </button>
-            <h2>My Orders</h2>
-        `;
+        document.querySelectorAll('.pack-card').forEach(card => {
+            const stockKey = card.getAttribute('data-stock-key');
+            const statusEl = card.querySelector('.stock-status');
+            const stockCount = stocksData[stockKey] !== undefined ? Number(stocksData[stockKey]) : 0;
 
-        const ordersRef = query(ref(db, 'orders'), orderByChild('userId'), equalTo(user.uid));
-        
-        onValue(ordersRef, (snapshot) => {
-            let orderHtml = `
-                <button onclick="location.reload()" style="margin-bottom:15px; padding:8px 15px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer;">
-                    ← Back
-                </button>
-                <h2>My Orders</h2>
-            `;
-            
-            let orderArray = [];
-            snapshot.forEach((s) => { orderArray.push(s.val()); });
-            orderArray.reverse(); 
-
-            if (orderArray.length > 0) {
-                orderArray.forEach((o) => {
-                    let statusColor = '#eab308';
-                    if (o.status === 'Complete') statusColor = 'green';
-                    else if (o.status === 'Rejected') statusColor = 'red';
-
-                    orderHtml += `
-                        <div class="order-card">
-                            <p style="font-size: 14px; margin: 3px 0;">Product: <b>${o.product || "N/A"}</b></p>
-                            <p style="font-size: 14px; margin: 3px 0;">Email: <b>${o.email || "N/A"}</b></p>
-                            <p style="font-size: 14px; margin: 3px 0;">Status: <b style="color:${statusColor}">${o.status}</b></p>
-                        </div>`;
-                });
-                area.innerHTML = orderHtml;
-            } else { 
-                area.innerHTML = orderHtml + "<p>No Order History</p>"; 
+            if (stockCount > 0) {
+                card.classList.remove('out-of-stock');
+                statusEl.className = 'status in-stock stock-status';
+                statusEl.innerText = `• In Stock: ${stockCount}`;
+            } else {
+                card.classList.remove('selected');
+                card.classList.add('out-of-stock');
+                statusEl.className = 'status out-stock-text stock-status';
+                statusEl.innerText = `• Out of Stock`;
             }
         });
-    };
+
+        // यदि हाल सेलेक्ट गरिएको आइटम आउट अफ स्टक भयो भने चयन हटाउने
+        if (selectedItemName) {
+            const selectedCard = document.querySelector('.pack-card.selected');
+            if (selectedCard && selectedCard.classList.contains('out-of-stock')) {
+                selectedCard.classList.remove('selected');
+                selectedItemName = "";
+                selectedItemPrice = "";
+                document.getElementById('summary-item').innerText = "-";
+                document.getElementById('summary-total').innerText = "Rs 0.00";
+            }
+        }
+    });
 
     const mainActionBtn = document.getElementById('main-action-btn');
     const gameUidInput = document.getElementById('game-uid');
@@ -512,6 +489,11 @@
     };
 
     window.selectPack = function(element, name, price) {
+        // यदि आउट अफ स्टक छ भने चयन गर्न नदिने
+        if (element.classList.contains('out-of-stock')) {
+            return;
+        }
+
         if (diamondsWrapper) diamondsWrapper.classList.remove('error-border');
         if (packError) packError.style.display = "none";
 
@@ -594,7 +576,7 @@
             userId: currentUser.uid,
             product: selectedItemName,
             amountDue: selectedItemPrice,
-            email: emailValue, // अब 'uid' को सट्टा 'email' मा युजरले हालेको इमेल बस्नेछ
+            email: emailValue,
             transactionId: txidValue,
             status: "Pending"
         }).then(() => {
@@ -622,6 +604,8 @@
 
 </body>
 </html>
+
+
 
 <br>
 <br>
