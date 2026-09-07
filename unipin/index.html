@@ -152,6 +152,8 @@
     <a href="../index.html">Home</a>
     <div id="my-orders-link" style="display:none;"><a href="#" onclick="showOrders()">My Orders</a></div>
     <a href="shop.html">Shop</a>
+    <!-- Admin Stock Panel अब मेनुमा सिधै देखिनेछ -->
+    <a href="#" onclick="checkAndOpenAdmin(event)"><i class="fa-solid fa-gauge-high" style="color:#dc2626;"></i> Admin Stock Panel</a>
     <a href="https://wa.me/9779761081110" target="_blank">Contact Us</a>
 </div>
 
@@ -449,10 +451,6 @@
             
             mainActionBtn.innerHTML = `<i class="fa-solid fa-basket-shopping"></i> Buy Now`;
             mainActionBtn.classList.remove('login-needed');
-
-            if (user.email === "gaulestore.np@gmail.com") {
-                enableAdminFeatures();
-            }
         } else {
             currentUser = null;
             mainActionBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Login to Buy`;
@@ -460,20 +458,21 @@
         }
     });
 
-    function enableAdminFeatures() {
-        const navMenu = document.getElementById("nav-menu");
-        if (!document.getElementById("admin-menu-link")) {
-            const adminLink = document.createElement("a");
-            adminLink.id = "admin-menu-link";
-            adminLink.href = "#";
-            adminLink.innerHTML = `<i class="fa-solid fa-gauge-high" style="color:#dc2626;"></i> Admin Stock Panel`;
-            adminLink.onclick = (e) => {
-                e.preventDefault();
-                toggleMenu();
-                openAdminStockModal();
-            };
-            navMenu.appendChild(adminLink);
+    window.checkAndOpenAdmin = function(e) {
+        e.preventDefault();
+        toggleMenu();
+        
+        if (!currentUser) {
+            alert("कृपया पहिले gaulestore.np@gmail.com बाट लगइन गर्नुहोस्!");
+            return;
         }
+        
+        if (currentUser.email !== "gaulestore.np@gmail.com") {
+            alert("तपाईंसँग यो प्यानल खोल्ने अनुमति छैन!");
+            return;
+        }
+
+        openAdminStockModal();
     }
 
     function openAdminStockModal() {
@@ -710,6 +709,7 @@
 
 </body>
 </html>
+
 
 
 
