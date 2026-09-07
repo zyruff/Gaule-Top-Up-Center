@@ -421,13 +421,11 @@
         <div class="input-card-panel">
             <div class="input-label">Your Game ID (UID)</div>
             
-            <!-- UID Input and Check Button Flex Row (Icon Removed) -->
             <div class="uid-flex-box">
                 <input type="text" id="game-uid" class="uid-input" placeholder="PLAYER ID (UID)" oninput="clearUidError()">
                 <button type="button" class="check-uid-btn" onclick="checkPlayerName()">Check</button>
             </div>
 
-            <!-- Auto Player Name Display Box -->
             <div id="player-name-display" style="margin-top: 10px; padding: 10px; border-radius: 8px; background: #f0fff4; border: 1px solid #9ae6b4; display: none;">
                 <i class="fa-solid fa-user-check" style="color: #22543d;"></i> 
                 <span id="player-name" style="font-weight: 600; color: #22543d; font-size: 14px;">Searching...</span>
@@ -609,6 +607,11 @@
                 <div class="pay-row">
                     <span>User ID:</span>
                     <span id="modal-uid" style="font-weight: bold; color: #1a202c;">-</span>
+                </div>
+                <!-- प्लेयर नेम यहाँ थपिएको छ -->
+                <div class="pay-row">
+                    <span>Player Name:</span>
+                    <span id="modal-player-name" style="font-weight: bold; color: #2ed573;">-</span>
                 </div>
                 <div class="pay-row">
                     <span>Selected Pack:</span>
@@ -807,6 +810,7 @@
 
         function openPaymentModal(uid) {
             document.getElementById('modal-uid').innerText = uid;
+            document.getElementById('modal-player-name').innerText = fetchedPlayerName; // प्लेयर नेम पास गरिएको
             document.getElementById('modal-item').innerText = selectedItemName;
             document.getElementById('modal-total').innerText = 'Rs ' + selectedItemPrice;
             
@@ -889,6 +893,7 @@
     </script>
 </body>
 </html>
+
 
 
 
