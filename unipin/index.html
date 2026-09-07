@@ -41,6 +41,10 @@
         .store-title { font-size: 1.5rem; font-weight: bold; }
         .login-svg { width: 32px; height: 32px; cursor: pointer; stroke: black; fill: none; }
 
+        /* Admin Floating Quick Button (gaulestore.np@gmail.com मात्र देखिने) */
+        #admin-quick-btn-container { display: none; padding: 10px 16px; background: #fff3f3; border-bottom: 1px solid #ffcdd2; text-align: center; }
+        .admin-action-chip { background-color: #dc2626; color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 5px rgba(220, 38, 38, 0.3); }
+
         .banner-container { padding: 16px; background: linear-gradient(180deg, #ffffff 0%, #f7fafc 100%); border-bottom: 1px solid #e2e8f0; }
         .badges-wrapper { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
         .badge { font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
@@ -140,6 +144,13 @@
     </div>
 </div>
 
+<!-- Admin को लागि मात्र देखिने सिधा Quick Button (Header को ठिक मुनि) -->
+<div id="admin-quick-btn-container">
+    <button class="admin-action-chip" onclick="openAdminStockModal()">
+        <i class="fa-solid fa-gauge-high"></i> Admin Stock Panel (Edit Stock)
+    </button>
+</div>
+
 <div id="nav-menu">
     <div class="menu-header">
         <span style="font-weight:bold;">Menu</span>
@@ -152,7 +163,7 @@
     <a href="../index.html">Home</a>
     <div id="my-orders-link" style="display:none;"><a href="#" onclick="showOrders()">My Orders</a></div>
     <a href="shop.html">Shop</a>
-    <!-- Admin Stock Panel अब मेनुमा सिधै देखिनेछ -->
+    <!-- मेनु भित्र पनि अप्सन राखिएको छ -->
     <a href="#" onclick="checkAndOpenAdmin(event)"><i class="fa-solid fa-gauge-high" style="color:#dc2626;"></i> Admin Stock Panel</a>
     <a href="https://wa.me/9779761081110" target="_blank">Contact Us</a>
 </div>
@@ -440,6 +451,7 @@
     const txidError = document.getElementById('txid-error');
 
     onAuthStateChanged(auth, (user) => {
+        const adminQuickContainer = document.getElementById("admin-quick-btn-container");
         if (user) {
             currentUser = user;
             document.getElementById("my-orders-link").style.display = "block";
@@ -449,10 +461,18 @@
             document.getElementById("display-name").innerText = user.displayName;
             document.getElementById("display-email").innerText = user.email;
             
+            // gaulestore.np@gmail.com हो भने मात्र सिधा Edit गर्ने बटन देखाउने
+            if (user.email === "gaulestore.np@gmail.com") {
+                adminQuickContainer.style.display = "block";
+            } else {
+                adminQuickContainer.style.display = "none";
+            }
+
             mainActionBtn.innerHTML = `<i class="fa-solid fa-basket-shopping"></i> Buy Now`;
             mainActionBtn.classList.remove('login-needed');
         } else {
             currentUser = null;
+            adminQuickContainer.style.display = "none";
             mainActionBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> Login to Buy`;
             mainActionBtn.classList.add('login-needed');
         }
@@ -475,7 +495,12 @@
         openAdminStockModal();
     }
 
-    function openAdminStockModal() {
+    window.openAdminStockModal = function() {
+        if (!currentUser || currentUser.email !== "gaulestore.np@gmail.com") {
+            alert("यो प्यानल खोल्न केवल gaulestore.np@gmail.com लाई मात्र अनुमति छ!");
+            return;
+        }
+
         let modal = document.getElementById("adminStockModal");
         if (!modal) {
             modal = document.createElement("div");
@@ -709,6 +734,7 @@
 
 </body>
 </html>
+
 
 
 
