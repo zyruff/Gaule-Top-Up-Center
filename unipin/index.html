@@ -123,6 +123,24 @@
         .success-receipt-info { background-color: #f7fafc; border: 1px dashed #cbd5e0; border-radius: 8px; padding: 12px; text-align: left; font-size: 13px; margin-bottom: 20px; }
         .receipt-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
         .success-close-btn { background-color: #1a202c; color: #ffffff; border: none; width: 100%; padding: 12px; font-weight: 600; border-radius: 8px; cursor: pointer; }
+
+        /* Premium Admin Panel Styles */
+        .admin-modal-card { background: linear-gradient(135deg, #1e1e2f 0%, #111119 100%); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; max-width: 480px !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important; text-align: left !important; }
+        .admin-modal-card .close-modal { color: #a0aec0; background: rgba(255,255,255,0.05); padding: 6px 10px; border-radius: 50%; font-size: 16px; top: 18px; right: 18px; }
+        .admin-modal-card .close-modal:hover { color: #fff; background: rgba(220, 38, 38, 0.8); }
+        .admin-title-area { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+        .admin-title-area i { color: #ffb300; font-size: 20px; }
+        .admin-modal-card .qr-title { color: #ffffff; font-size: 20px; text-align: left; }
+        .admin-modal-card .qr-subtitle { color: #a0aec0; text-align: left; margin-bottom: 20px; font-size: 12px; }
+        .admin-stock-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; transition: all 0.2s ease; }
+        .admin-stock-row:hover { background: rgba(255, 255, 255, 0.07); border-color: rgba(255, 179, 0, 0.3); }
+        .admin-pack-label { font-size: 13px; font-weight: 500; color: #e2e8f0; width: 55%; display: flex; align-items: center; gap: 8px; }
+        .admin-pack-label i { color: #ffb300; font-size: 11px; }
+        .admin-stock-input { width: 75px; padding: 8px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 6px; color: #fff; text-align: center; font-weight: 600; font-size: 14px; outline: none; }
+        .admin-stock-input:focus { border-color: #ffb300; box-shadow: 0 0 0 2px rgba(255, 179, 0, 0.2); }
+        .admin-save-btn { background: linear-gradient(135deg, #2ed573 0%, #26af5f 100%); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700; box-shadow: 0 4px 10px rgba(46, 213, 115, 0.2); transition: all 0.2s ease; }
+        .admin-save-btn:hover { transform: translateY(-1px); opacity: 0.9; }
+        .admin-close-panel-btn { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); margin-top: 15px; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3); }
     </style>
 </head>
 <body>
@@ -461,7 +479,6 @@
             document.getElementById("display-name").innerText = user.displayName;
             document.getElementById("display-email").innerText = user.email;
             
-            // gaulestore.np@gmail.com हो भने मात्र सिधा Edit गर्ने बटन देखाउने
             if (user.email === "gaulestore.np@gmail.com") {
                 adminQuickContainer.style.display = "block";
             } else {
@@ -507,12 +524,15 @@
             modal.id = "adminStockModal";
             modal.className = "qr-modal";
             modal.innerHTML = `
-                <div class="qr-card" style="max-width: 450px; max-height: 80vh; overflow-y: auto;">
+                <div class="qr-card admin-modal-card" style="max-height: 85vh; overflow-y: auto;">
                     <i class="fa-solid fa-xmark close-modal" onclick="document.getElementById('adminStockModal').classList.remove('show')"></i>
-                    <div class="qr-title">Admin Stock Manager</div>
-                    <div class="qr-subtitle">Update stock numbers in real-time</div>
-                    <div id="admin-stock-list" style="margin: 15px 0; text-align: left;"></div>
-                    <button class="done-btn" onclick="document.getElementById('adminStockModal').classList.remove('show')">Close Panel</button>
+                    <div class="admin-title-area">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <div class="qr-title">Admin Stock Manager</div>
+                    </div>
+                    <div class="qr-subtitle">Manage and update package inventory in real-time</div>
+                    <div id="admin-stock-list" style="margin: 10px 0;"></div>
+                    <button class="done-btn admin-close-panel-btn" onclick="document.getElementById('adminStockModal').classList.remove('show')">Close Panel</button>
                 </div>
             `;
             document.body.appendChild(modal);
@@ -520,7 +540,7 @@
         modal.classList.add('show');
 
         const stockListContainer = document.getElementById("admin-stock-list");
-        stockListContainer.innerHTML = "Loading stocks...";
+        stockListContainer.innerHTML = "<div style='text-align:center; color:#a0aec0; padding: 20px;'>Loading inventory...</div>";
 
         get(ref(db, 'stocks')).then((snapshot) => {
             const stocksData = snapshot.val() || {};
@@ -532,11 +552,11 @@
                 const currentStock = stocksData[stockKey] !== undefined ? stocksData[stockKey] : 0;
 
                 const row = document.createElement("div");
-                row.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 8px; background: #f7fafc; border-radius: 6px;";
+                row.className = "admin-stock-row";
                 row.innerHTML = `
-                    <span style="font-size: 13px; font-weight: 500; width: 60%;">${packTitle}</span>
-                    <input type="number" id="admin-input-${stockKey}" value="${currentStock}" style="width: 70px; padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px; text-align: center;">
-                    <button onclick="updateStock('${stockKey}')" style="background: #2ed573; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Save</button>
+                    <span class="admin-pack-label"><i class="fa-solid fa-gem"></i> ${packTitle}</span>
+                    <input type="number" id="admin-input-${stockKey}" value="${currentStock}" class="admin-stock-input">
+                    <button onclick="updateStock('${stockKey}')" class="admin-save-btn">Save</button>
                 `;
                 stockListContainer.appendChild(row);
             });
@@ -734,6 +754,7 @@
 
 </body>
 </html>
+
 
 
 
