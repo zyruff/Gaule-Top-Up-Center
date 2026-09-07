@@ -152,10 +152,12 @@
         .pack-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #1a202c; }
         .pack-price { font-size: 15px; font-weight: 700; color: #ffb300; }
         .diamond-icon { position: absolute; bottom: 14px; right: 14px; color: #3182ce; font-size: 20px; }
+        
         .admin-api-panel { background: #fffdf5; border: 1px dashed #ffb300; border-radius: 12px; padding: 14px; margin: 0 16px 20px 16px; display: none; }
         .admin-api-panel.show { display: block; }
         .admin-api-panel input { width: 100%; padding: 8px 10px; margin-bottom: 8px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 12px; outline: none; }
-        .admin-save-btn { background: #ffb300; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; }
+        .admin-save-btn { background: #ffb300; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; width: 100%; margin-top: 4px; }
+        
         .bottom-drawer { position: fixed; bottom: 55px; left: 2px; right: 2px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); z-index: 100; }
         .drawer-inner { max-width: 600px; margin: 0 auto; }
         .row-detail { display: flex; justify-content: space-between; font-size: 13px; color: #4a5568; margin-bottom: 8px; }
@@ -226,14 +228,20 @@
         <div class="tab">Membership</div>
     </div>
 
-    <!-- Admin API Control Panel -->
+    <!-- Admin API & QR Control Panel -->
     <div class="admin-api-panel" id="adminApiPanel">
-        <div style="font-weight: 700; font-size: 13px; color: #b7791f; margin-bottom: 6px;"><i class="fa-solid fa-gear"></i> Admin API Settings</div>
+        <div style="font-weight: 700; font-size: 13px; color: #b7791f; margin-bottom: 6px;"><i class="fa-solid fa-gear"></i> Admin Dashboard Settings</div>
+        
         <label style="font-size: 11px; color: #4a5568; font-weight: 600;">API URL endpoint:</label>
         <input type="text" id="admin-api-url" placeholder="https://api.gameskinbo.com/ff-info/get">
+        
         <label style="font-size: 11px; color: #4a5568; font-weight: 600;">API Key (x-api-key):</label>
         <input type="text" id="admin-api-key" placeholder="Enter API Key">
-        <button class="admin-save-btn" onclick="saveApiSettings()">Save API Settings</button>
+
+        <label style="font-size: 11px; color: #4a5568; font-weight: 600; margin-top: 6px; display: block;">QR Code Image URL:</label>
+        <input type="text" id="admin-qr-url" placeholder="qr_code.png वा इमेजको प्रत्यक्ष लिंक">
+
+        <button class="admin-save-btn" onclick="saveAdminSettings()">Save Settings</button>
     </div>
 
 <div class="section-box">
@@ -248,7 +256,6 @@
             <button class="check-btn" onclick="checkPlayerName()">Check</button>
         </div>
 
-        <!-- Player Name Display -->
         <div id="player-name-display" style="margin-top: 10px; padding: 10px; border-radius: 8px; background: #f0fff4; border: 1px solid #9ae6b4; display: none;">
             <i class="fa-solid fa-user-check" style="color: #22543d;"></i> 
             <span id="player-name" style="font-weight: 600; color: #22543d; font-size: 14px;">-</span>
@@ -424,7 +431,8 @@
             </div>
 
             <div class="qr-image-wrapper">
-                <img src="qr_code.png" alt="Payment QR Code">
+                <!-- dynamic QR image element -->
+                <img id="dynamic-qr-img" src="qr_code.png" alt="Payment QR Code">
             </div>
 
             <div class="txid-container">
@@ -520,6 +528,7 @@
         // Default Fallbacks
         let currentApiUrl = "https://api.gameskinbo.com/ff-info/get";
         let currentApiKey = "8-kVJLu1Bxy5Mj6tmJupzSwK3WSJJ22wj29FGVvwwm4";
+        let currentQrUrl = "qr_code.png";
 
         const mainActionBtn = document.getElementById('main-action-btn');
         const gameUidInput = document.getElementById('game-uid');
@@ -529,24 +538,32 @@
         const txidInput = document.getElementById('txid');
         const txidError = document.getElementById('txid-error');
         const adminApiPanel = document.getElementById('adminApiPanel');
+        const dynamicQrImg = document.getElementById('dynamic-qr-img');
 
-        // Load API settings from Firebase on startup and update variables
-        async function loadApiSettings() {
+        // Load API and QR settings from Firebase
+        async function loadAdminSettings() {
             try {
                 const snapshot = await get(child(ref(db), 'settings/api'));
                 if (snapshot.exists()) {
                     const data = snapshot.val();
                     if (data.url) currentApiUrl = data.url;
                     if (data.key) currentApiKey = data.key;
+                    if (data.qrUrl) currentQrUrl = data.qrUrl;
+
+                    // Update QR image on page
+                    if (dynamicQrImg) {
+                        dynamicQrImg.src = currentQrUrl;
+                    }
                     
-                    // यदि एडमिन प्यानल खुल्ला छ भने इनपुट बक्समा पनि हालैको भ्यालु देखाउने
+                    // Fill admin panel inputs if admin is logged in
                     if (currentUser && currentUser.email === "gaulestore.np@gmail.com") {
                         document.getElementById('admin-api-url').value = currentApiUrl;
                         document.getElementById('admin-api-key').value = currentApiKey;
+                        document.getElementById('admin-qr-url').value = currentQrUrl;
                     }
                 }
             } catch (e) {
-                console.log("Using default API configurations");
+                console.log("Using default configurations");
             }
         }
 
@@ -556,10 +573,9 @@
                 mainActionBtn.innerHTML = `<i class="fa-solid fa-basket-shopping"></i> Buy Now`;
                 mainActionBtn.classList.remove('login-needed');
 
-                // एडमिन इमेल चेक गरि एडमिन प्यानल देखाउने र Firebase बाट डाटा लोड गर्ने
                 if (user.email === "gaulestore.np@gmail.com") {
                     adminApiPanel.classList.add('show');
-                    await loadApiSettings();
+                    await loadAdminSettings();
                 } else {
                     adminApiPanel.classList.remove('show');
                 }
@@ -571,25 +587,29 @@
             }
         });
 
-        // Page Load हुँदा नै Firebase बाट API Settings तान्ne
-        loadApiSettings();
+        // Initial load
+        loadAdminSettings();
 
-        window.saveApiSettings = function() {
+        window.saveAdminSettings = function() {
             const newUrl = document.getElementById('admin-api-url').value.trim();
             const newKey = document.getElementById('admin-api-key').value.trim();
+            const newQrUrl = document.getElementById('admin-qr-url').value.trim();
 
-            if (!newUrl || !newKey) {
-                alert("कृपया API URL र Key दुवै भर्नुहोस्!");
+            if (!newUrl || !newKey || !newQrUrl) {
+                alert("कृपया सबै फिल्डहरू भर्नुहोस्!");
                 return;
             }
 
             set(ref(db, 'settings/api'), {
                 url: newUrl,
-                key: newKey
+                key: newKey,
+                qrUrl: newQrUrl
             }).then(() => {
                 currentApiUrl = newUrl;
                 currentApiKey = newKey;
-                alert("API Settings Successfully Updated!");
+                currentQrUrl = newQrUrl;
+                dynamicQrImg.src = currentQrUrl;
+                alert("Settings Successfully Updated & Saved!");
             }).catch((err) => {
                 alert("Failed to update: " + err.message);
             });
