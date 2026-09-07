@@ -233,9 +233,10 @@
             <button class="check-btn" onclick="checkPlayerName()">Check</button>
         </div>
 
+        <!-- Player Name Display (suru ma display: none huncha, fetch vayepachi dekhaucha) -->
         <div id="player-name-display" style="margin-top: 10px; padding: 10px; border-radius: 8px; background: #f0fff4; border: 1px solid #9ae6b4; display: none;">
             <i class="fa-solid fa-user-check" style="color: #22543d;"></i> 
-            <span id="player-name" style="font-weight: 600; color: #22543d; font-size: 14px;">Searching...</span>
+            <span id="player-name" style="font-weight: 600; color: #22543d; font-size: 14px;">-</span>
         </div>
         
         <div class="error-message" id="uid-error">
@@ -250,7 +251,7 @@
 </div>
 
 <script>
-    let fetchedPlayerName = "Manual Check"; 
+    let fetchedPlayerName = ""; 
     const apiKey = "8-kVJLu1Bxy5Mj6tmJupzSwK3WSJJ22wj29FGVvwwm4";
 
     async function checkPlayerName() {
@@ -264,11 +265,14 @@
             gameUidInput.classList.add('error-border');
             uidError.style.display = "flex";
             display.style.display = "none";
+            fetchedPlayerName = "";
             return;
         }
 
         display.style.display = "block";
         nameSpan.innerText = "Searching...";
+        display.style.background = "#f0fff4";
+        display.style.borderColor = "#9ae6b4";
         uidError.style.display = "none";
 
         try {
@@ -280,19 +284,20 @@
             if (data.AccountInfo && data.AccountInfo.AccountName) {
                 fetchedPlayerName = data.AccountInfo.AccountName;
                 nameSpan.innerText = "Player: " + fetchedPlayerName;
-                display.style.background = "#f0fff4";
-                display.style.borderColor = "#9ae6b4";
+                display.style.display = "block"; // Safa dekhaune
             } else {
-                fetchedPlayerName = "Invalid ID";
+                fetchedPlayerName = "";
                 nameSpan.innerText = "Invalid ID";
                 display.style.background = "#fff5f5";
                 display.style.borderColor = "#feb2b2";
+                display.style.display = "block";
             }
         } catch (error) {
-            fetchedPlayerName = "Error Fetching";
-            nameSpan.innerText = "Could not fetch name (Proceed anyway)";
+            fetchedPlayerName = "";
+            nameSpan.innerText = "Could not fetch name";
             display.style.background = "#fffaf0";
             display.style.borderColor = "#fbd38d";
+            display.style.display = "block";
         }
     }
 </script>
@@ -475,6 +480,10 @@
                     <span>Game UID:</span>
                     <span id="modal-uid" style="font-weight: bold; color: #1a202c;">-</span>
                 </div>
+                <div class="pay-row" id="modal-player-row" style="display: none;">
+                    <span>Player Name:</span>
+                    <span id="modal-player-name" style="font-weight: 600; color: #22543d;">-</span>
+                </div>
                 <div class="pay-row">
                     <span>Selected Pack:</span>
                     <span id="modal-item">-</span>
@@ -614,6 +623,11 @@
                 gameUidInput.classList.remove('error-border');
                 uidError.style.display = "none";
             }
+            // User le UID फेर्न थालेपछि पुरानो नाम लुकाउन चाहेंमा यहाँबाट ह्यान्डल गर्न सकिन्छ
+            if(gameUidInput.value.trim() === "") {
+                document.getElementById('player-name-display').style.display = "none";
+                window.fetchedPlayerName = "";
+            }
         };
 
         window.validateTxIDLive = function() {
@@ -625,6 +639,16 @@
 
         function openPaymentModal(uid) {
             document.getElementById('modal-uid').innerText = uid;
+            
+            // QR modal भित्र player name देखाउने वा लुकाउने logic
+            const modalPlayerRow = document.getElementById('modal-player-row');
+            if (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName && fetchedPlayerName !== "Invalid ID") {
+                document.getElementById('modal-player-name').innerText = fetchedPlayerName;
+                modalPlayerRow.style.display = "flex";
+            } else {
+                modalPlayerRow.style.display = "none";
+            }
+
             document.getElementById('modal-item').innerText = selectedItemName;
             document.getElementById('modal-total').innerText = 'Rs ' + selectedItemPrice;
             
@@ -671,7 +695,7 @@
                 product: selectedItemName,
                 amountDue: selectedItemPrice,
                 uid: uidValue,
-                playerName: fetchedPlayerName,
+                playerName: fetchedPlayerName || "Not Fetched",
                 transactionId: txidValue,
                 status: "Pending"
             }).then(() => {
@@ -694,6 +718,7 @@
     </script>
 </body>
 </html>
+
 
 
 
