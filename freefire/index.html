@@ -530,7 +530,7 @@
         const txidError = document.getElementById('txid-error');
         const adminApiPanel = document.getElementById('adminApiPanel');
 
-        // Load API settings from Firebase on startup
+        // Load API settings from Firebase on startup and update variables
         async function loadApiSettings() {
             try {
                 const snapshot = await get(child(ref(db), 'settings/api'));
@@ -538,24 +538,28 @@
                     const data = snapshot.val();
                     if (data.url) currentApiUrl = data.url;
                     if (data.key) currentApiKey = data.key;
+                    
+                    // यदि एडमिन प्यानल खुल्ला छ भने इनपुट बक्समा पनि हालैको भ्यालु देखाउने
+                    if (currentUser && currentUser.email === "gaulestore.np@gmail.com") {
+                        document.getElementById('admin-api-url').value = currentApiUrl;
+                        document.getElementById('admin-api-key').value = currentApiKey;
+                    }
                 }
             } catch (e) {
                 console.log("Using default API configurations");
             }
         }
-        loadApiSettings();
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
                 mainActionBtn.innerHTML = `<i class="fa-solid fa-basket-shopping"></i> Buy Now`;
                 mainActionBtn.classList.remove('login-needed');
 
-                // एडमिन इमेल चेक गरि एडमिन प्यानल देखाउने
+                // एडमिन इमेल चेक गरि एडमिन प्यानल देखाउने र Firebase बाट डाटा लोड गर्ने
                 if (user.email === "gaulestore.np@gmail.com") {
                     adminApiPanel.classList.add('show');
-                    document.getElementById('admin-api-url').value = currentApiUrl;
-                    document.getElementById('admin-api-key').value = currentApiKey;
+                    await loadApiSettings();
                 } else {
                     adminApiPanel.classList.remove('show');
                 }
@@ -566,6 +570,9 @@
                 adminApiPanel.classList.remove('show');
             }
         });
+
+        // Page Load हुँदा नै Firebase बाट API Settings तान्ne
+        loadApiSettings();
 
         window.saveApiSettings = function() {
             const newUrl = document.getElementById('admin-api-url').value.trim();
