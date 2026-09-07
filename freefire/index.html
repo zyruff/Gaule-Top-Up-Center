@@ -265,7 +265,7 @@
         if (!uid) {
             gameUidInput.classList.add('error-border');
             uidError.style.display = "flex";
-            uidError.querySelector("span").innerText = "Invalid or Missing UID!";
+            uidError.querySelector("span").innerText = "Please enter your Game UID!";
             display.style.display = "none";
             fetchedPlayerName = "";
             return;
@@ -279,7 +279,7 @@
         gameUidInput.classList.remove('error-border');
 
         try {
-            const response = await fetch(`https://api.gameskinbo.com/ff-info/get?uid=${uid}&region=BD`, {
+            const response = attetchAPIRes = await fetch(`https://api.gameskinbo.com/ff-info/get?uid=${uid}&region=BD`, {
                 headers: { 'x-api-key': apiKey }
             });
             const data = await response.json();
@@ -607,11 +607,11 @@
             }
 
             let uidValue = gameUidInput.value.trim();
-            // UID खाली छ वा API बाट नाम फेच भएको छैन भने अर्डर रोक्ने र Invalid or Missing UID देखाउने
-            if (uidValue === "" || !fetchedPlayerName) {
+            // UID मात्र खाली छ भने रोक्ने (गलत भए पनि, नाम नआए पनि अर्डर गर्न मिल्ने)
+            if (uidValue === "") {
                 gameUidInput.classList.add('error-border');
                 uidError.style.display = "flex";
-                uidError.querySelector("span").innerText = "Invalid or Missing UID!";
+                uidError.querySelector("span").innerText = "Please enter your Game UID!";
                 if(isFormValid) gameUidInput.focus();
                 isFormValid = false;
             }
@@ -639,10 +639,6 @@
                 gameUidInput.classList.remove('error-border');
                 uidError.style.display = "none";
             }
-            if(gameUidInput.value.trim() === "") {
-                document.getElementById('player-name-display').style.display = "none";
-                window.fetchedPlayerName = "";
-            }
         };
 
         window.validateTxIDLive = function() {
@@ -656,7 +652,8 @@
             document.getElementById('modal-uid').innerText = uid;
             
             const modalPlayerRow = document.getElementById('modal-player-row');
-            const finalPlayerName = (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName) ? fetchedPlayerName : "Unknown";
+            // यदि नाम फेला परेको छैन भने Not Checked वा UID मात्र राख्ने
+            const finalPlayerName = (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName) ? fetchedPlayerName : "Not Checked / Manual";
             
             document.getElementById('modal-player-name').innerText = finalPlayerName;
             modalPlayerRow.style.display = "flex";
@@ -696,7 +693,7 @@
 
             const now = new Date();
             const orderRef = push(ref(db, 'orders'));
-            const finalPlayerName = (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName) ? fetchedPlayerName : "Unknown";
+            const finalPlayerName = (typeof fetchedPlayerName !== 'undefined' && fetchedPlayerName) ? fetchedPlayerName : "Not Checked / Manual";
             
             set(orderRef, {
                 date: now.toLocaleDateString(),
@@ -731,6 +728,7 @@
     </script>
 </body>
 </html>
+
 
 
 
